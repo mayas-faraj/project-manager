@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50)
+  password String @db.VarChar(50)
+  avatar String? @db.VarChar(250)
+  lastLoginAt DateTime?
+  createdAt DateTime @default(now()) @map("created_at")
+  role Role @default(VIEWER)
+  @@unique([name])
+  @@map("user")
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50)
+  excerpt String? @db.VarChar(500)
+  avatar String? @db.VarChar(250)
+  createdAt DateTime @default(now()) @map("created_at")
+  projects Project[]
+  @@unique([name])
+  @@map("company")
+}
+
+model Department {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50)
+  excerpt String? @db.VarChar(500)
+  avatar String? @db.VarChar(250)
+  createdAt DateTime @default(now()) @map("created_at")
+  engineers Engineer[]
+  @@unique([name])
+  @@map("department")
+}
+
+model Engineer {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50)
+  phone String? @db.VarChar(50)
+  excerpt String? @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at")
+  departmentId Int @map("department_id")
+  department Department @relation(fields: [departmentId], references: [id])
+  projects Project[]
+  @@unique([name, departmentId])
+  @@map("engineer")
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50)
+  excerpt String? @db.VarChar(500)
+  remark String?
+  address String? @db.VarChar(500)
+  locationLongitude Float? @default(0) @map("location_longitude")
+  locationLatitude Float? @default(0) @map("location_latitude")
+  duration Int @default(0)
+  cost Decimal @default(0)
+  amountPaid Decimal @default(0) @map("amount_paid")
+  status Status @default(WORKING)
+  companyId Int @map("company_id")
+  company Company? @relation(fields: [companyId], references: [id])
+  engineerId Int @map("engineer_id")
+  engineer Engineer? @relation(fields: [engineerId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  media Media[]
+  payments Payment[]
+  suspends Suspend[]
+  @@unique([name])
+  @@map("project")
+}
+
+model Media {
+  id Int @id @default(autoincrement())
+  src String @db.VarChar(500)
+  title String @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  projectId Int @map("project_id")
+  project Project @relation(fields: [projectId], references: [id])
+  @@map("media")
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+  amount Decimal @default(0)
+  paidAt DateTime @default(now()) @map("paid_at")
+  description String? @db.VarChar(500)
+  projectId Int @map("project_id")
+  project Project @relation(fields: [projectId], references: [id])
+  @@map("payment")
+}
+
+model Suspend {
+  id Int @id @default(autoincrement())
+  fromDate DateTime @default(now()) @map("from_date")
+  toDate DateTime @map("to_date")
+  description String? @db.VarChar(500)
+  projectId Int @map("project_id")
+  project Project @relation(fields: [projectId], references: [id])
+  @@map("suspend")
+}
+
+enum Status {
+  WORKING
+  STOPPED
+  COMPLETED
+  LATE
+}
+
+enum Role {
+  ADMIN
+  PROJECT_MANAGER
+  VIEWER
+}
