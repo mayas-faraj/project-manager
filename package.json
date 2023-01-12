@@ -1,11 +1,10 @@
 {
   "name": "project-manager",
-  "type": "module",
   "version": "0.1.0",
   "description": "backend layer for project manager",
   "main": "dist/index.js",
   "prisma": {
-    "seed": "node prisma/seed.js "
+    "seed": "ts-node prisma/seed.ts "
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

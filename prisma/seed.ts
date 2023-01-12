@@ -2,6 +2,16 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 async function main () {
   let result
+
+  await prisma.suspend.deleteMany({});
+  await prisma.payment.deleteMany({});
+  await prisma.media.deleteMany({});
+  await prisma.project.deleteMany({});
+  await prisma.engineer.deleteMany({});
+  await prisma.department.deleteMany({});
+  await prisma.company.deleteMany({});
+  await prisma.user.deleteMany({});
+
   result = await prisma.user.createMany({
     data: [
       {
