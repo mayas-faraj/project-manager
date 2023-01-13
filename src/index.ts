@@ -6,6 +6,7 @@ import * as engineerController from './controller/engineerController'
 import * as userController from './controller/userController'
 import * as projectController from './controller/projectController'
 import dotenv from 'dotenv'
+import { Company, Department, Engineer, Project, User } from '@prisma/client'
 
 // reading config
 dotenv.config()
@@ -16,6 +17,8 @@ const router: Router = Router()
 const port = process.env.PORT ?? '3000'
 
 // available models
+type Model = Company | Department | Engineer | User | Project
+
 const models = [
     { route: 'companies', contoller: companyController},
     { route: 'departments', contoller: departmentController},
@@ -31,7 +34,18 @@ models.forEach(model=>{
         const take: number | undefined = req.query.pageSize != undefined ? parseInt(req.query.pageSize as string): undefined
         const page: number | undefined = req.query.page != undefined ? parseInt(req.query.page as string): undefined
         const skip: number | undefined = (take !== undefined && page !== undefined) ? page * take: undefined
-        res.json(await model.contoller.read(take, skip))
+        const result = await model.contoller.read(take, skip)
+
+        const outputResult: Model[] = result.map((item: Model) => {
+            const keys = Object.keys(item) as Array<keyof Model>
+            for(let i:number = 0; i< keys.length; i++)
+                if(keys[i].endsWith('Id'))
+                    delete item[keys[i]]
+
+            return item
+        })
+
+        res.json(result)
     })
 
     router.get(modelRoute + '/:id([0-9]+)', async (req: Request, res: Response) => {
@@ -40,7 +54,7 @@ models.forEach(model=>{
 
     router.post(modelRoute, async (req:Request, res: Response) => {
         const data = req.body
-        data.creatorId = 2  
+        data.creatorId = 1  
         res.json(await model.contoller.create(req.body))
     })
 
@@ -59,7 +73,7 @@ models.forEach(model=>{
 // add middle ware
 app.use(express.json())
 app.use('/api', router)
-
+app.use('/uploads', express.static('/uploads'))
 // starting server
 app.get('/', (req: Request, res: Response) => res.json({message: 'server is running'}))
 app.listen(port, () => { console.log(`server is running at: http://localhost:${port}`) })

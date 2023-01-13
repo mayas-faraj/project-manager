@@ -7,12 +7,7 @@ export async function read(take?: number, skip?: number ): Promise<Project[]> {
     
     let result: Project[] = await prismaClient.project.findMany({
         take,
-        skip,
-        include: {
-            suspends: true,
-            payments: true,
-            media: true
-        }
+        skip
      });
     return result
 }
@@ -21,6 +16,13 @@ export async function find(id: number ): Promise<Project | object> {
     let result: Project | null = await prismaClient.project.findUnique({
         where: {
             id: id
+        },
+        include: {
+            suspends: true,
+            payments: true,
+            media: true,
+            engineer: true,
+            company: true
         }
     })
 

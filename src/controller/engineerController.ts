@@ -13,6 +13,9 @@ export async function find(id: number ): Promise<Engineer | object> {
     let result: Engineer | null = await prismaClient.engineer.findUnique({
         where: {
             id: id
+        },
+        include: {
+            department: true
         }
     })
 
