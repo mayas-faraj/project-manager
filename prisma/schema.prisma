@@ -13,7 +13,7 @@ datasource db {
 model User {
   id                 Int                 @id @default(autoincrement())
   name               String              @db.VarChar(50)
-  password           String              @db.VarChar(50)
+  password           String              @db.VarChar(150)
   avatar             String?             @db.VarChar(250)
   lastLoginAt        DateTime?           @map("last_login_at")
   createdAt          DateTime            @default(now()) @map("created_at")
@@ -25,7 +25,8 @@ model User {
   createdPayments    Payment[]
   createdSuspends    Suspend[]
   createdMedia       Media[]
-  viewingProjects  UsersViewProjects[]
+  viewingProjects    UsersViewProjects[]
+  setting            Setting[]
 
   @@unique([name])
   @@map("user")
@@ -62,9 +63,9 @@ model Department {
 model Engineer {
   id           Int        @id @default(autoincrement())
   name         String     @db.VarChar(50)
-  phone        String?     @db.VarChar(50)
+  phone        String?    @db.VarChar(50)
   excerpt      String?    @db.VarChar(500)
-  avatar        String?    @db.VarChar(250)
+  avatar       String?    @db.VarChar(250)
   createdAt    DateTime   @default(now()) @map("created_at")
   departmentId Int        @map("department_id")
   department   Department @relation(fields: [departmentId], references: [id])
@@ -99,7 +100,7 @@ model Project {
   media             Media[]
   payments          Payment[]
   suspends          Suspend[]
-  viewers UsersViewProjects[]
+  viewers           UsersViewProjects[]
 
   @@unique([name])
   @@map("project")
@@ -153,6 +154,17 @@ model Suspend {
   creator     User     @relation(fields: [creatorId], references: [id])
 
   @@map("suspend")
+}
+
+model Setting {
+  id     Int     @id @default(autoincrement())
+  userId Int?
+  key    String  @db.VarChar(100)
+  value  String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@unique([key])
+  @@map("setting")
 }
 
 enum Status {

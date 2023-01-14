@@ -17,21 +17,21 @@ async function main () {
       {
         id: 1,
         name: 'administrator',
-        password: '123',
+        password: 'bc46ab36ba8e55b77465205466c998445bf59e43e86404a1533f127baaf0295d63c4d01852119a880fcf92bcd2425ec926224a661e906882c8df20c67e3ba994',
         avatar: '/uploads/imgs/admin.png',
         role: 'ADMIN'
       },
       {
         id: 2,
         name: 'zaher',
-        password: '123',
+        password: 'ea351821f0d58296fc3eba8591fa199a435e4ddfe4d988f56c1cac694533854197ede24392ef3ced8db82bbd46c407768b7875cc845b31065b4ae814fdc09a85',
         avatar: '/uploads/imgs/zaher.png',
         role: 'PROJECT_MANAGER'
       },
       {
         id: 3,
         name: 'mayas',
-        password: '123',
+        password: '3505ac73417d654c0f22ede988f6e4fcb4108eecc35b2aafcd722fae9c121223bbdb6f728bdd913246dfa120df595183d811578a549458a2bbfdd8f5f405b556',
         avatar: '/uploads/imgs/mayas.png',
         role: 'VIEWER'
       }

@@ -1,56 +1,159 @@
-import { Engineer } from '@prisma/client';
+import { Engineer, PrismaClient } from '@prisma/client'
 import { Prisma }  from '../prismaClient'
+import { Model, UserInfo, OperationResult } from '../types'
+import { ControllerBase } from './controllerBase'
 
-const prismaClient = new Prisma().getPrismaClient();
+export default class EngineerController extends ControllerBase {
+    public constructor() {
+        super()
+        this.prismaClient = new Prisma().getPrismaClient()
+    }
 
-export async function read(take?: number, skip?: number ): Promise<Engineer[]> {
+    public async read(userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
+        let condition = undefined
+
+        if(userInfo.rol === 'VIEWER')
+            return {
+                success: false,
+                message: `user: ${userInfo.nam} is under role <viewr> and cann't read engineers`
+            };
+        else if(userInfo.rol === 'PROJECT_MANAGER')
+            condition = {
+                creatorId: userInfo.id
+            }
     
-    let result: Engineer[] = await prismaClient.engineer.findMany({ take, skip });
-    return result
-}
+        let result: Engineer[] = await this.prismaClient.engineer.findMany({ 
+            take, 
+            skip,
+            where: condition
+        })
+        return result;
+    }
+    public async find(userInfo: UserInfo, id: number): Promise<Model | OperationResult | null> {
+        let creatorId = undefined
 
-export async function find(id: number ): Promise<Engineer | object> {
-    let result: Engineer | null = await prismaClient.engineer.findUnique({
-        where: {
-            id: id
-        },
-        include: {
-            department: true
-        }
-    })
+        if(userInfo.rol === 'VIEWER')
+            return {
+                success: false,
+                message: `user: ${userInfo.nam} is under role <viewr> and cann't search for engineer`
+            };
+        else if(userInfo.rol === 'PROJECT_MANAGER')
+            creatorId = userInfo.id
 
-    return result?? {}
-}
-
-export async function create(data: Object): Promise<Engineer> {
-    let result: Engineer = await prismaClient.engineer.create({
-        data: data as Engineer
-    })
-
-    return result;
-}
-
-export async function update(id: number, data: Object): Promise<Engineer> {
-    let result: Engineer = await prismaClient.engineer.update({
-        where: {
-            id: id
-        },
-        data: data
-    })
-
-    return result
-}
-
-export async function drop(id: number): Promise<Engineer | object> {
-    try {
-        let result: Engineer = await prismaClient.engineer.delete({
+        let result: Engineer | null = await this.prismaClient.engineer.findFirst({
             where: {
-                id: id
+                AND: {
+                    id: id,
+                    creatorId: creatorId
+                }
+            },
+            include: {
+                projects: true,
+                department: true
             }
         })
-        return result
+
+        return result;
     }
-    catch (ex) {
-        return {}
+    public async create(userInfo: UserInfo, data: Object): Promise<OperationResult> {
+        if(userInfo.rol === 'VIEWER')
+            return {
+                success: false,
+                message: `user: ${userInfo.nam} is under role <viewr> and cann't create engineer`
+            };
+        
+        const engineerData = data as Engineer
+        engineerData.creatorId = userInfo.id
+        
+        let result: Engineer = await this.prismaClient.engineer.create({
+            data: data as Engineer
+        })
+    
+        return {
+            success: true,
+            message: `engineer has been created`
+        };
     }
+
+    public async update(userInfo: UserInfo, id: number, data: Object): Promise<OperationResult> {
+        let creatorId = undefined
+
+        if(userInfo.rol === 'VIEWER')
+            return {
+                success: false,
+                message: `user: ${userInfo.nam} is under role <viewr> and cann't update engineer`
+            };
+        else if(userInfo.rol === 'PROJECT_MANAGER')
+            creatorId = userInfo.id
+
+        try {
+            let result = await this.prismaClient.engineer.updateMany({
+                where: {
+                    AND: {
+                        id: id,
+                        creatorId: creatorId
+                    }
+                },
+                data: data
+            })
+        
+            if(result.count>0)
+                return {
+                    success: true,
+                    message: `engineer has been updated`
+                };
+            else
+                return {
+                    success: false,
+                    message: `engineer ${id} not found or user: ${userInfo.nam} is cann't update the engineer, or no update will made`
+                };
+        }
+        catch (ex) {
+            return {
+                success: false,
+                message: `unique constraint error for engineer: ${id} or internal error`
+            }
+        }
+    }
+    public async drop(userInfo: UserInfo, id: number): Promise<OperationResult> {
+        let creatorId = undefined
+
+        if(userInfo.rol === 'VIEWER')
+            return {
+                success: false,
+                message: `user: ${userInfo.nam} is under role <viewr> and cann't delete engineer`
+            };
+        else if(userInfo.rol === 'PROJECT_MANAGER')
+            creatorId = userInfo.id
+
+        try {
+            let result = await this.prismaClient.engineer.deleteMany({
+                where: {
+                    AND: {
+                        id: id,
+                        creatorId: creatorId
+                    }
+                }
+            })
+            
+            if(result.count>0)
+            return {
+                success: true,
+                message: `engineer has been delete`
+            };
+        else
+            return {
+                success: false,
+                message: `engineer ${id} not found or user: ${userInfo.nam} is cann't delete the engineer`
+            };
+        }
+        catch (ex) {
+            return {
+                success: false,
+                message: `engineer ${id} not found or internal error`
+            };
+        }
+    }
+
+    private prismaClient: PrismaClient
 }
