@@ -4,6 +4,7 @@ import modelRouter from './route/model'
 import loginRouter from './route/login'
 import authorizationMiddleware from './middleware/authorization'
 import dotenv from 'dotenv'
+import { join } from 'path'
 
 // reading config
 dotenv.config()
@@ -17,7 +18,8 @@ const port = process.env.PORT ?? '3000'
 app.use(express.json())
 app.use('/api', authorizationMiddleware, modelRouter)
 app.use('/', loginRouter)
-app.use('/imgs', express.static('/uploads/imgs'))
+app.use('/uploads/imgs', express.static(join(__dirname, '/uploads/imgs')))
+
 // starting server
-app.get('/', (req: Request, res: Response) => res.json({message: 'server is running'}))
+app.get('/', (req: Request, res: Response) => res.json({ message: 'server is running' }))
 app.listen(port, () => { console.log(`server is running at: http://localhost:${port}`) })

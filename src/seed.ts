@@ -1,16 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
-async function main () {
+async function main (): Promise<void> {
   let result
 
-  await prisma.suspend.deleteMany({});
-  await prisma.payment.deleteMany({});
-  await prisma.media.deleteMany({});
-  await prisma.project.deleteMany({});
-  await prisma.engineer.deleteMany({});
-  await prisma.department.deleteMany({});
-  await prisma.company.deleteMany({});
-  await prisma.user.deleteMany({});
+  await prisma.suspend.deleteMany({})
+  await prisma.payment.deleteMany({})
+  await prisma.media.deleteMany({})
+  await prisma.project.deleteMany({})
+  await prisma.engineer.deleteMany({})
+  await prisma.department.deleteMany({})
+  await prisma.company.deleteMany({})
+  await prisma.user.deleteMany({})
 
   result = await prisma.user.createMany({
     data: [
@@ -394,8 +394,8 @@ async function main () {
   console.log(result)
 }
 
-main().then(() => prisma.$disconnect())
-  .catch((error) => {
+main().then(async () => { await prisma.$disconnect() })
+  .catch(async (error) => {
     console.log(error)
-    prisma.$disconnect()
+    await prisma.$disconnect()
   })
