@@ -74,21 +74,21 @@ async function main () {
         id: 1,
         name: 'ادارة تنفيذ الانشاءات',
         excerpt: 'مؤسسة تابعة لوزارة الاعمار',
-        avatar: '/uploads/imgs/mtaa.png',
+        avatar: '/uploads/imgs/mtaa.jpg',
         creatorId: 1
       },
       {
         id: 2,
         name: 'دائرة الاعمار',
         excerpt: 'دائرة حكومية خاصة باعادة الاعمار',
-        avatar: '/uploads/imgs/emar-dep.png',
+        avatar: '/uploads/imgs/emar-dep.jpg',
         creatorId: 2
       },
       {
         id: 3,
         name: 'دائرة الرقابة والتفتيش',
         excerpt: 'دائرة تابعة لهيئة الرقابة والتفتيش',
-        avatar: '/uploads/imgs/investigate.png',
+        avatar: '/uploads/imgs/investigate.jpg',
         creatorId: 2
       }
     ]
@@ -103,7 +103,7 @@ async function main () {
         name: 'لؤي صوان',
         phone: '0911223344',
         excerpt: 'مهندس انشائي بخبرة 15 سنة',
-        avatar: '/uploads/imgs/loai.png',
+        avatar: '/uploads/imgs/loai.jpg',
         creatorId: 1,
         departmentId: 1
       },
@@ -112,7 +112,7 @@ async function main () {
         name: 'عادل العلي',
         phone: '0933445566',
         excerpt: 'مهندس مدني مختص بالدراسات الهندسية',
-        avatar: '/uploads/imgs/adel.png',
+        avatar: '/uploads/imgs/adel.jpg',
         creatorId: 1,
         departmentId: 1
       },
@@ -121,7 +121,7 @@ async function main () {
         name: 'سامر القطشة',
         phone: '0922334455',
         excerpt: 'مهندس عمارة خبرة 18 سنة',
-        avatar: '/uploads/imgs/samer.png',
+        avatar: '/uploads/imgs/samer.jpg',
         creatorId: 1,
         departmentId: 1
       },
@@ -130,7 +130,7 @@ async function main () {
         name: 'عماد الاحمد',
         phone: '0912312312',
         excerpt: 'مهندس عمارة خريج 2012',
-        avatar: '/uploads/imgs/emad.png',
+        avatar: '/uploads/imgs/emad.jpg',
         creatorId: 1,
         departmentId: 1
       }
@@ -363,7 +363,7 @@ async function main () {
       media: {
         createMany: {
           data: [
-            { src: '/uploads/imgs/project4-1.png', title: 'مخطط المشروع', creatorId: 1 }
+            { src: '/uploads/imgs/project5-1.png', title: 'مخطط المشروع', creatorId: 1 }
           ]
         }
       },

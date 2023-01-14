@@ -13,10 +13,11 @@ const app: Express = express()
 const port = process.env.PORT ?? '3000'
 
 // add middle ware
+
 app.use(express.json())
 app.use('/api', authorizationMiddleware, modelRouter)
 app.use('/', loginRouter)
-app.use('/uploads', express.static('/uploads'))
+app.use('/imgs', express.static('/uploads/imgs'))
 // starting server
 app.get('/', (req: Request, res: Response) => res.json({message: 'server is running'}))
 app.listen(port, () => { console.log(`server is running at: http://localhost:${port}`) })
