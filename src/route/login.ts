@@ -7,12 +7,11 @@ import dotenv from 'dotenv'
 const router = Router()
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 router.post('/login', async (req: Request, res: Response) => {
-  const result = { message: '', token: '', status: false }
+  const result = { success: false, message: '', token: '', role: '' }
   const user: string = req.body.user
   const password: string = req.body.password
-
-  if (user.length === 0) result.message = 'user is empty'
-  else if (password.length === 0) result.message = 'password is empty'
+  if (user !== undefined && user.length === 0) result.message = 'user is empty'
+  else if (password !== undefined && password.length === 0) result.message = 'password is empty'
   else {
     const userResult = await new UserController().findByName(user)
     if (userResult == null) {
@@ -23,7 +22,8 @@ router.post('/login', async (req: Request, res: Response) => {
         dotenv.config()
         const secret: string = process.env.SECRET ?? ''
         result.message = 'login success'
-        result.status = true
+        result.success = true
+        result.role = userDb.role
         result.token = sign({
           id: userDb.id,
           nam: userDb.name,
