@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const password_hash_1 = require("../password-hash");
 const prismaClient_1 = require("../prismaClient");
 const controllerBase_1 = require("./controllerBase");
 class UserController extends controllerBase_1.ControllerBase {
@@ -51,8 +52,11 @@ class UserController extends controllerBase_1.ControllerBase {
                     message: `user: ${userInfo.nam} is under role <viewr> or <project-manager> and cann't create user`
                 };
             }
+            const userData = data;
+            if (userData.password !== undefined)
+                userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
             const result = yield this.prismaClient.user.create({
-                data: data
+                data: userData
             });
             if (result !== undefined) {
                 return {
@@ -70,14 +74,28 @@ class UserController extends controllerBase_1.ControllerBase {
     }
     update(userInfo, id, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol === 'ADMIN' || id === userInfo.id) {
+            if (userInfo.rol === 'ADMIN' || (id === 0)) {
                 try {
-                    const result = yield this.prismaClient.user.update({
-                        where: {
-                            id
-                        },
-                        data
-                    });
+                    let result;
+                    const userData = data;
+                    if (userData.password !== undefined)
+                        userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
+                    if (userInfo.rol === 'ADMIN') {
+                        result = yield this.prismaClient.user.update({
+                            where: {
+                                id
+                            },
+                            data
+                        });
+                    }
+                    else {
+                        result = yield this.prismaClient.user.update({
+                            where: {
+                                id: userInfo.id
+                            },
+                            data
+                        });
+                    }
                     if (result !== undefined) {
                         return {
                             success: true,

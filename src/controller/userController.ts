@@ -1,4 +1,5 @@
 import { User, PrismaClient } from '@prisma/client'
+import { getPasswordHash } from '../password-hash'
 import { Prisma } from '../prismaClient'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
@@ -45,8 +46,10 @@ export default class UserController extends ControllerBase {
       }
     }
 
+    const userData = data as User
+    if (userData.password !== undefined) userData.password = getPasswordHash(userData.password)
     const result = await this.prismaClient.user.create({
-      data: data as User
+      data: userData
     })
 
     if (result !== undefined) {
@@ -63,14 +66,27 @@ export default class UserController extends ControllerBase {
   }
 
   public async update (userInfo: UserInfo, id: number, data: Object): Promise<OperationResult> {
-    if (userInfo.rol === 'ADMIN' || id === userInfo.id) {
+    if (userInfo.rol === 'ADMIN' || (id === 0)) {
       try {
-        const result = await this.prismaClient.user.update({
-          where: {
-            id
-          },
-          data
-        })
+        let result: any
+
+        const userData = data as User
+        if (userData.password !== undefined) userData.password = getPasswordHash(userData.password)
+        if (userInfo.rol === 'ADMIN') {
+          result = await this.prismaClient.user.update({
+            where: {
+              id
+            },
+            data
+          })
+        } else {
+          result = await this.prismaClient.user.update({
+            where: {
+              id: userInfo.id
+            },
+            data
+          })
+        }
 
         if (result !== undefined) {
           return {

@@ -21,12 +21,12 @@ const router = (0, express_1.Router)();
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const result = { message: '', token: '', status: false };
+    const result = { success: false, message: '', token: '', role: '' };
     const user = req.body.user;
     const password = req.body.password;
-    if (user.length === 0)
+    if (user !== undefined && user.length === 0)
         result.message = 'user is empty';
-    else if (password.length === 0)
+    else if (password !== undefined && password.length === 0)
         result.message = 'password is empty';
     else {
         const userResult = yield new userController_1.default().findByName(user);
@@ -39,7 +39,8 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 dotenv_1.default.config();
                 const secret = (_a = process.env.SECRET) !== null && _a !== void 0 ? _a : '';
                 result.message = 'login success';
-                result.status = true;
+                result.success = true;
+                result.role = userDb.role;
                 result.token = (0, jsonwebtoken_1.sign)({
                     id: userDb.id,
                     nam: userDb.name,

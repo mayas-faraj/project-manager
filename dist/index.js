@@ -20,7 +20,7 @@ const port = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : '3000';
 app.use(express_1.default.json());
 app.use('/api', authorization_1.default, model_1.default);
 app.use('/', login_1.default);
-app.use('/upload/imgs', express_1.default.static((0, path_1.join)(__dirname, '/uploads/imgs')));
+app.use('/uploads/imgs', express_1.default.static((0, path_1.join)(__dirname, '/uploads/imgs')));
 // starting server
 app.get('/', (req, res) => res.json({ message: 'server is running' }));
 app.listen(port, () => { console.log(`server is running at: http://localhost:${port}`); });
