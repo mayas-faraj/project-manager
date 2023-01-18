@@ -17,6 +17,7 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const password_hash_1 = require("../password-hash");
 const userController_1 = __importDefault(require("../controller/userController"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const prismaClient_1 = require("../prismaClient");
 const router = (0, express_1.Router)();
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -44,9 +45,18 @@ router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 result.token = (0, jsonwebtoken_1.sign)({
                     id: userDb.id,
                     nam: userDb.name,
-                    rol: userDb.role,
-                    exp: (new Date().getTime() / 1000) + (60 * 60)
+                    rol: userDb.role
+                    // exp: (new Date().getTime() / 1000) + (60 * 60)
                 }, secret);
+                const prismaClient = new prismaClient_1.Prisma().getPrismaClient();
+                yield prismaClient.user.update({
+                    where: {
+                        id: userDb.id
+                    },
+                    data: {
+                        lastLoginAt: new Date()
+                    }
+                });
             }
             else {
                 result.message = 'password is not valid';

@@ -24,14 +24,16 @@ const models = [
 ];
 const stripFields = (model) => {
     const inputModel = model;
-    const keys = Object.keys(model);
-    for (let i = 0; i < keys.length; i++) {
-        if (typeof inputModel[keys[i]] === 'object') {
-            stripFields(inputModel[keys[i]]);
-        }
-        else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete inputModel[keys[i]];
+    if (inputModel != null) {
+        const keys = Object.keys(model);
+        for (let i = 0; i < keys.length; i++) {
+            if (typeof inputModel[keys[i]] === 'object') {
+                stripFields(inputModel[keys[i]]);
+            }
+            else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                delete inputModel[keys[i]];
+            }
         }
     }
 };

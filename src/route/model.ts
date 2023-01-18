@@ -15,13 +15,15 @@ const models = [
 
 const stripFields = (model: object): void => {
   const inputModel = model as Partial<Model>
-  const keys = Object.keys(model) as Array<keyof Model>
-  for (let i: number = 0; i < keys.length; i++) {
-    if (typeof inputModel[keys[i]] === 'object') {
-      stripFields(inputModel[keys[i]] as unknown as Model)
-    } else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete inputModel[keys[i]]
+  if (inputModel != null) {
+    const keys = Object.keys(model) as Array<keyof Model>
+    for (let i: number = 0; i < keys.length; i++) {
+      if (typeof inputModel[keys[i]] === 'object') {
+        stripFields(inputModel[keys[i]] as unknown as Model)
+      } else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete inputModel[keys[i]]
+      }
     }
   }
 }

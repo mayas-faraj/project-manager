@@ -3,6 +3,7 @@ import { sign } from 'jsonwebtoken'
 import { validatePassword } from '../password-hash'
 import UserController from '../controller/userController'
 import dotenv from 'dotenv'
+import { Prisma } from '../prismaClient'
 
 const router = Router()
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -30,6 +31,15 @@ router.post('/login', async (req: Request, res: Response) => {
           rol: userDb.role
           // exp: (new Date().getTime() / 1000) + (60 * 60)
         }, secret)
+        const prismaClient = new Prisma().getPrismaClient()
+        await prismaClient.user.update({
+          where: {
+            id: userDb.id
+          },
+          data: {
+            lastLoginAt: new Date()
+          }
+        })
       } else { result.message = 'password is not valid' }
     }
   }
