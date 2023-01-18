@@ -24,18 +24,7 @@ export default class ProjectController extends ControllerBase {
     const result: Project[] = await this.prismaClient.project.findMany({
       take,
       skip,
-      where: condition,
-      include: {
-        media: {
-          orderBy: {
-            orderIndex: 'asc'
-          }
-        }
-      }
-    })
-
-    result.forEach(project => {
-      this.addAvatarField(project)
+      where: condition
     })
 
     return result
@@ -60,10 +49,9 @@ export default class ProjectController extends ControllerBase {
       },
       include: {
         suspends: true,
+        extensions: true,
         payments: true,
-        media: true,
-        company: true,
-        engineer: true
+        media: true
       }
     })
 
@@ -174,12 +162,6 @@ export default class ProjectController extends ControllerBase {
         success: false,
         message: `project ${id} not found or internal error`
       }
-    }
-  }
-
-  private addAvatarField (project: any): void {
-    if (project.media !== undefined && project.media.length >= 0) {
-      project.avatar = project.media[0].src
     }
   }
 }

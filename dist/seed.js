@@ -18,9 +18,6 @@ function main() {
         yield prisma.payment.deleteMany({});
         yield prisma.media.deleteMany({});
         yield prisma.project.deleteMany({});
-        yield prisma.engineer.deleteMany({});
-        yield prisma.department.deleteMany({});
-        yield prisma.company.deleteMany({});
         yield prisma.user.deleteMany({});
         result = yield prisma.user.createMany({
             data: [
@@ -48,120 +45,37 @@ function main() {
             ]
         });
         console.log(result);
-        result = yield prisma.company.createMany({
-            data: [
-                {
-                    id: 1,
-                    name: 'شام القابضة',
-                    excerpt: 'شركة بناء وتعمير وتعهدات ضمن محافظة النجف',
-                    avatar: '/uploads/imgs/sham.png',
-                    creatorId: 1
-                },
-                {
-                    id: 2,
-                    name: 'اعمار للانشاءات',
-                    excerpt: 'شركة هندسية للإنشاء والتعمير والدراسات',
-                    avatar: '/uploads/imgs/emar.png',
-                    creatorId: 2
-                },
-                {
-                    id: 3,
-                    name: 'ارامكو',
-                    excerpt: 'تعهدات بناء ضمن العراق',
-                    avatar: '/uploads/imgs/aramco.png',
-                    creatorId: 2
-                }
-            ]
-        });
-        console.log(result);
-        result = yield prisma.department.createMany({
-            data: [
-                {
-                    id: 1,
-                    name: 'ادارة تنفيذ الانشاءات',
-                    excerpt: 'مؤسسة تابعة لوزارة الاعمار',
-                    avatar: '/uploads/imgs/mtaa.jpg',
-                    creatorId: 1
-                },
-                {
-                    id: 2,
-                    name: 'دائرة الاعمار',
-                    excerpt: 'دائرة حكومية خاصة باعادة الاعمار',
-                    avatar: '/uploads/imgs/emar-dep.jpg',
-                    creatorId: 2
-                },
-                {
-                    id: 3,
-                    name: 'دائرة الرقابة والتفتيش',
-                    excerpt: 'دائرة تابعة لهيئة الرقابة والتفتيش',
-                    avatar: '/uploads/imgs/investigate.jpg',
-                    creatorId: 2
-                }
-            ]
-        });
-        console.log(result);
-        result = yield prisma.engineer.createMany({
-            data: [
-                {
-                    id: 1,
-                    name: 'لؤي صوان',
-                    phone: '0911223344',
-                    excerpt: 'مهندس انشائي بخبرة 15 سنة',
-                    avatar: '/uploads/imgs/loai.jpg',
-                    creatorId: 1,
-                    departmentId: 1
-                },
-                {
-                    id: 2,
-                    name: 'عادل العلي',
-                    phone: '0933445566',
-                    excerpt: 'مهندس مدني مختص بالدراسات الهندسية',
-                    avatar: '/uploads/imgs/adel.jpg',
-                    creatorId: 1,
-                    departmentId: 1
-                },
-                {
-                    id: 3,
-                    name: 'سامر القطشة',
-                    phone: '0922334455',
-                    excerpt: 'مهندس عمارة خبرة 18 سنة',
-                    avatar: '/uploads/imgs/samer.jpg',
-                    creatorId: 1,
-                    departmentId: 1
-                },
-                {
-                    id: 4,
-                    name: 'عماد الاحمد',
-                    phone: '0912312312',
-                    excerpt: 'مهندس عمارة خريج 2012',
-                    avatar: '/uploads/imgs/emad.jpg',
-                    creatorId: 1,
-                    departmentId: 1
-                }
-            ]
-        });
-        console.log(result);
         result = yield prisma.project.create({
             data: {
                 name: 'نقابة المهندسين',
-                excerpt: 'مشروع اعادة نقابة المهنسين العراقيين',
-                remark: 'لا يوجد',
-                address: 'الانبار - الشارع العام',
-                locationLatitude: 16.5,
-                locationLongitude: 22.5,
+                remark: 'مشروع اعادة نقابة المهنسين العراقيين',
                 duration: 450,
                 cost: 1600000000,
                 amountPaid: 400000000,
                 status: 'WORKING',
-                engineerId: 1,
-                companyId: 1,
+                avatar: '/uploads/imgs/project1-1.jpg',
+                companyName: 'الشركة المتحدة',
                 creatorId: 1,
+                engineerName: 'لؤي صوان',
+                engineerPhone: '0933445566',
+                engineerDepartment: 'قسم الدراسات الفنية',
+                extensions: {
+                    createMany: {
+                        data: [
+                            {
+                                fromDate: new Date(2023, 1, 4),
+                                toDate: new Date(2023, 2, 7),
+                                description: 'تمديد اولي',
+                                creatorId: 1
+                            }
+                        ]
+                    }
+                },
                 media: {
                     createMany: {
                         data: [
-                            { src: '/uploads/imgs/project1-1.png', title: 'واجهة البناء', creatorId: 1 },
-                            { src: '/uploads/imgs/project1-2.png', title: 'منظر جانبي', creatorId: 1 },
-                            { src: '/uploads/imgs/project1-3.png', title: 'منظر جانبي', creatorId: 1 }
+                            { src: '/uploads/imgs/project1-2.jpg', title: 'واجهة البناء', creatorId: 1, orderIndex: 1 },
+                            { src: '/uploads/imgs/project1-3.jpg', title: 'منظر جانبي', creatorId: 1, orderIndex: 2 }
                         ]
                     }
                 },
@@ -199,18 +113,35 @@ function main() {
         result = yield prisma.project.create({
             data: {
                 name: 'ملعب الاتحاد',
-                excerpt: 'ملعب كرة قدم',
-                remark: 'لا يوجد',
-                address: 'الانبار - بناء المحافظة',
-                locationLatitude: 12.5,
-                locationLongitude: 52.5,
+                remark: 'ملعب كرة قدم',
                 duration: 450,
                 cost: 1100000000,
                 amountPaid: 340000000,
                 status: 'WORKING',
-                engineerId: 2,
-                companyId: 2,
                 creatorId: 2,
+                avatar: '/uploads/imgs/project2-1.jpg',
+                companyName: 'شركة الأفق الدولية',
+                engineerName: 'حسان الثابت',
+                engineerPhone: '0933123123',
+                engineerDepartment: 'قسم البحوث العلمية',
+                extensions: {
+                    createMany: {
+                        data: [
+                            {
+                                fromDate: new Date(2023, 1, 1),
+                                toDate: new Date(2023, 1, 8),
+                                description: 'تمديد غير مشروع',
+                                creatorId: 1
+                            },
+                            {
+                                fromDate: new Date(2023, 1, 12),
+                                toDate: new Date(2023, 1, 17),
+                                description: 'تمديد بسبب الاحوال الجوية',
+                                creatorId: 1
+                            }
+                        ]
+                    }
+                },
                 media: {
                     createMany: {
                         data: [
@@ -247,24 +178,22 @@ function main() {
         result = yield prisma.project.create({
             data: {
                 name: 'ساحة الحياة',
-                excerpt: 'ساحة وسط المحافظة مزودة بنوافير لضخ المياة وحديقة ازهار',
-                remark: 'لا يوجد',
-                address: 'ساحة المدينة - الشارع الرئيسي',
-                locationLatitude: 16.5,
-                locationLongitude: 22.5,
+                remark: 'ساحة وسط المحافظة مزودة بنوافير لضخ المياة وحديقة ازهار',
                 duration: 250,
                 cost: 200000000,
                 amountPaid: 100000000,
                 status: 'LATE',
-                engineerId: 4,
-                companyId: 3,
-                creatorId: 1,
+                avatar: '/uploads/imgs/project3-1.jpg',
+                companyName: 'شركة جلجامش',
+                creatorId: 2,
+                engineerName: 'علي الاسمر',
+                engineerPhone: '09656578',
+                engineerDepartment: 'دائرة التعمير',
                 media: {
                     createMany: {
                         data: [
-                            { src: '/uploads/imgs/project3-1.png', title: 'المنظر العلوي', creatorId: 1 },
-                            { src: '/uploads/imgs/project3-2.png', title: 'من ساحة الحياة', creatorId: 1 },
-                            { src: '/uploads/imgs/project3-3.png', title: 'من الشارع العام', creatorId: 1 }
+                            { src: '/uploads/imgs/project3-2.png', title: 'المنظر العلوي', creatorId: 1 },
+                            { src: '/uploads/imgs/project3-3.png', title: 'من ساحة الحياة', creatorId: 1 }
                         ]
                     }
                 },
@@ -306,23 +235,21 @@ function main() {
         result = yield prisma.project.create({
             data: {
                 name: 'مشفى الامل',
-                excerpt: 'مشفى عامل لعلاج جميع الامراض',
-                remark: 'بدء البناء بجوائز ارتفاع 3 امتار',
-                address: 'ساحة المدينة - الشارع الرئيسي',
-                locationLatitude: 16.5,
-                locationLongitude: 22.5,
+                remark: 'مشفى عامل لعلاج جميع الامراض',
                 duration: 180,
                 cost: 1200000000,
                 amountPaid: 400000000,
                 status: 'WORKING',
-                engineerId: 3,
-                companyId: 3,
-                creatorId: 2,
+                avatar: '/uploads/imgs/project4-1.jpg',
+                companyName: '',
+                creatorId: 1,
+                engineerName: 'عادل الحموي',
+                engineerPhone: '09776655',
+                engineerDepartment: 'دائرة الهندسة المعمارية',
                 media: {
                     createMany: {
                         data: [
-                            { src: '/uploads/imgs/project4-1.png', title: 'منظر رئيسي', creatorId: 2 },
-                            { src: '/uploads/imgs/project4-2.png', title: '', creatorId: 2 },
+                            { src: '/uploads/imgs/project4-2.png', title: 'منظر رئيسي', creatorId: 2 },
                             { src: '/uploads/imgs/project4-3.png', title: '', creatorId: 2 }
                         ]
                     }
@@ -342,25 +269,17 @@ function main() {
         result = yield prisma.project.create({
             data: {
                 name: 'مدرسة التفوق للمتميزين',
-                excerpt: 'مدرسة نموذجية للمتفوقين في الشهادة الاعدادية بكافة فروعها',
-                remark: 'تم انشائها على نمط بناء اوروبي حديث',
-                address: 'شارع النصر - مقابل دار المهندسين',
-                locationLatitude: 16.5,
-                locationLongitude: 22.5,
+                remark: 'مدرسة نموذجية للمتفوقين في الشهادة الاعدادية بكافة فروعها',
                 duration: 400,
                 cost: 1350000000,
                 amountPaid: 350000000,
                 status: 'WORKING',
-                engineerId: 3,
-                companyId: 2,
+                avatar: '/uploads/imgs/project5-1.jpg',
+                companyName: '',
                 creatorId: 1,
-                media: {
-                    createMany: {
-                        data: [
-                            { src: '/uploads/imgs/project5-1.png', title: 'مخطط المشروع', creatorId: 1 }
-                        ]
-                    }
-                },
+                engineerName: 'سامر الجاعوني',
+                engineerPhone: '0933445544',
+                engineerDepartment: 'دائرة تنفيذ الانشاءات',
                 payments: {
                     createMany: {
                         data: [

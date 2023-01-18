@@ -1,8 +1,5 @@
 import { Router, Request, Response } from 'express'
 import { Model, OperationResult } from '../types'
-import CompanyController from '../controller/companyController'
-import DepartmentController from '../controller/departmentController'
-import EngineerController from '../controller/engineerController'
 import UserController from '../controller/userController'
 import ProjectController from '../controller/projectController'
 
@@ -12,9 +9,6 @@ const router: Router = Router()
 // available models
 
 const models = [
-  { route: 'companies', controller: new CompanyController() },
-  { route: 'departments', controller: new DepartmentController() },
-  { route: 'engineers', controller: new EngineerController() },
   { route: 'users', controller: new UserController() },
   { route: 'projects', controller: new ProjectController() }
 ]
@@ -25,7 +19,7 @@ const stripFields = (model: object): void => {
   for (let i: number = 0; i < keys.length; i++) {
     if (typeof inputModel[keys[i]] === 'object') {
       stripFields(inputModel[keys[i]] as unknown as Model)
-    } else if (keys[i].endsWith('Id') || keys[i].endsWith('password')) {
+    } else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete inputModel[keys[i]]
     }

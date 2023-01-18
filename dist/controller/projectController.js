@@ -31,17 +31,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
             const result = yield this.prismaClient.project.findMany({
                 take,
                 skip,
-                where: condition,
-                include: {
-                    media: {
-                        orderBy: {
-                            orderIndex: 'asc'
-                        }
-                    }
-                }
-            });
-            result.forEach(project => {
-                this.addAvatarField(project);
+                where: condition
             });
             return result;
         });
@@ -67,10 +57,9 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 },
                 include: {
                     suspends: true,
+                    extensions: true,
                     payments: true,
-                    media: true,
-                    company: true,
-                    engineer: true
+                    media: true
                 }
             });
             return result;
@@ -187,11 +176,6 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 };
             }
         });
-    }
-    addAvatarField(project) {
-        if (project.media !== undefined && project.media.length >= 0) {
-            project.avatar = project.media[0].src;
-        }
     }
 }
 exports.default = ProjectController;

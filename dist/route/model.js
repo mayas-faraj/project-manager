@@ -13,18 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const companyController_1 = __importDefault(require("../controller/companyController"));
-const departmentController_1 = __importDefault(require("../controller/departmentController"));
-const engineerController_1 = __importDefault(require("../controller/engineerController"));
 const userController_1 = __importDefault(require("../controller/userController"));
 const projectController_1 = __importDefault(require("../controller/projectController"));
 // define router
 const router = (0, express_1.Router)();
 // available models
 const models = [
-    { route: 'companies', controller: new companyController_1.default() },
-    { route: 'departments', controller: new departmentController_1.default() },
-    { route: 'engineers', controller: new engineerController_1.default() },
     { route: 'users', controller: new userController_1.default() },
     { route: 'projects', controller: new projectController_1.default() }
 ];
@@ -35,7 +29,7 @@ const stripFields = (model) => {
         if (typeof inputModel[keys[i]] === 'object') {
             stripFields(inputModel[keys[i]]);
         }
-        else if (keys[i].endsWith('Id') || keys[i].endsWith('password')) {
+        else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete inputModel[keys[i]];
         }

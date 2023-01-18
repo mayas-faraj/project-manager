@@ -27,8 +27,8 @@ router.post('/login', async (req: Request, res: Response) => {
         result.token = sign({
           id: userDb.id,
           nam: userDb.name,
-          rol: userDb.role,
-          exp: (new Date().getTime() / 1000) + (60 * 60)
+          rol: userDb.role
+          // exp: (new Date().getTime() / 1000) + (60 * 60)
         }, secret)
       } else { result.message = 'password is not valid' }
     }
