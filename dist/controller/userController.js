@@ -10,12 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const password_hash_1 = require("../password-hash");
-const prismaClient_1 = require("../prismaClient");
 const controllerBase_1 = require("./controllerBase");
 class UserController extends controllerBase_1.ControllerBase {
     constructor() {
         super();
-        this.prismaClient = new prismaClient_1.Prisma().getPrismaClient();
     }
     read(userInfo, take, skip) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,14 +32,27 @@ class UserController extends controllerBase_1.ControllerBase {
     }
     find(userInfo, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol !== 'ADMIN') {
+            if (userInfo.rol === 'ADMIN' || (id === 0)) {
+                try {
+                    const condition = { id: id !== 0 ? id : userInfo.id };
+                    const result = yield this.prismaClient.user.findFirst({
+                        where: condition
+                    });
+                    return result;
+                }
+                catch (ex) {
+                    return {
+                        success: false,
+                        message: `server site error for user while finding user: ${id} `
+                    };
+                }
+            }
+            else {
                 return {
                     success: false,
-                    message: `user: ${userInfo.nam} is under role <viewr> or <project-manager> and cann't search for users`
+                    message: `user: ${userInfo.nam} is not admin and not the same user to fetch`
                 };
             }
-            const result = yield this.prismaClient.user.findFirst({});
-            return result;
         });
     }
     create(userInfo, data) {
@@ -76,26 +87,14 @@ class UserController extends controllerBase_1.ControllerBase {
         return __awaiter(this, void 0, void 0, function* () {
             if (userInfo.rol === 'ADMIN' || (id === 0)) {
                 try {
-                    let result;
+                    const condition = { id: id !== 0 ? id : userInfo.id };
                     const userData = data;
                     if (userData.password !== undefined)
                         userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
-                    if (userInfo.rol === 'ADMIN') {
-                        result = yield this.prismaClient.user.update({
-                            where: {
-                                id
-                            },
-                            data
-                        });
-                    }
-                    else {
-                        result = yield this.prismaClient.user.update({
-                            where: {
-                                id: userInfo.id
-                            },
-                            data
-                        });
-                    }
+                    const result = yield this.prismaClient.user.update({
+                        where: condition,
+                        data
+                    });
                     if (result !== undefined) {
                         return {
                             success: true,

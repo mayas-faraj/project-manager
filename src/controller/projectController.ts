@@ -1,12 +1,10 @@
-import { Project, PrismaClient } from '@prisma/client'
-import { Prisma } from '../prismaClient'
+import { Project } from '@prisma/client'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
 
 export default class ProjectController extends ControllerBase {
   public constructor () {
     super()
-    this.prismaClient = new Prisma().getPrismaClient()
   }
 
   public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
@@ -26,8 +24,20 @@ export default class ProjectController extends ControllerBase {
     const result: Project[] = await this.prismaClient.project.findMany({
       take,
       skip,
-      where: condition
+      where: condition,
+      include: {
+        media: {
+          orderBy: {
+            orderIndex: 'asc'
+          }
+        }
+      }
     })
+
+    result.forEach(project => {
+      this.addAvatarField(project)
+    })
+
     return result
   }
 
@@ -167,5 +177,9 @@ export default class ProjectController extends ControllerBase {
     }
   }
 
-  private readonly prismaClient: PrismaClient
+  private addAvatarField (project: any): void {
+    if (project.media !== undefined && project.media.length >= 0) {
+      project.avatar = project.media[0].src
+    }
+  }
 }

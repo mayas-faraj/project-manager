@@ -1,13 +1,11 @@
-import { User, PrismaClient } from '@prisma/client'
+import { User } from '@prisma/client'
 import { getPasswordHash } from '../password-hash'
-import { Prisma } from '../prismaClient'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
 
 export default class UserController extends ControllerBase {
   public constructor () {
     super()
-    this.prismaClient = new Prisma().getPrismaClient()
   }
 
   public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
@@ -26,16 +24,26 @@ export default class UserController extends ControllerBase {
   }
 
   public async find (userInfo: UserInfo, id: number): Promise<Model | OperationResult | null> {
-    if (userInfo.rol !== 'ADMIN') {
+    if (userInfo.rol === 'ADMIN' || (id === 0)) {
+      try {
+        const condition = { id: id !== 0 ? id : userInfo.id }
+        const result = await this.prismaClient.user.findFirst({
+          where: condition
+        })
+
+        return result
+      } catch (ex) {
+        return {
+          success: false,
+          message: `server site error for user while finding user: ${id} `
+        }
+      }
+    } else {
       return {
         success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> or <project-manager> and cann't search for users`
+        message: `user: ${userInfo.nam} is not admin and not the same user to fetch`
       }
     }
-
-    const result: User | null = await this.prismaClient.user.findFirst({})
-
-    return result
   }
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
@@ -68,25 +76,13 @@ export default class UserController extends ControllerBase {
   public async update (userInfo: UserInfo, id: number, data: Object): Promise<OperationResult> {
     if (userInfo.rol === 'ADMIN' || (id === 0)) {
       try {
-        let result: any
-
+        const condition = { id: id !== 0 ? id : userInfo.id }
         const userData = data as User
         if (userData.password !== undefined) userData.password = getPasswordHash(userData.password)
-        if (userInfo.rol === 'ADMIN') {
-          result = await this.prismaClient.user.update({
-            where: {
-              id
-            },
-            data
-          })
-        } else {
-          result = await this.prismaClient.user.update({
-            where: {
-              id: userInfo.id
-            },
-            data
-          })
-        }
+        const result = await this.prismaClient.user.update({
+          where: condition,
+          data
+        })
 
         if (result !== undefined) {
           return {
@@ -156,6 +152,4 @@ export default class UserController extends ControllerBase {
 
     return result ?? null
   }
-
-  private readonly prismaClient: PrismaClient
 }

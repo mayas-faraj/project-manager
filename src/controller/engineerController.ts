@@ -1,12 +1,10 @@
-import { Engineer, PrismaClient } from '@prisma/client'
-import { Prisma } from '../prismaClient'
+import { Engineer } from '@prisma/client'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
 
 export default class EngineerController extends ControllerBase {
   public constructor () {
     super()
-    this.prismaClient = new Prisma().getPrismaClient()
   }
 
   public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
@@ -163,6 +161,4 @@ export default class EngineerController extends ControllerBase {
       }
     }
   }
-
-  private readonly prismaClient: PrismaClient
 }

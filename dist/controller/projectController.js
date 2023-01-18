@@ -9,12 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prismaClient_1 = require("../prismaClient");
 const controllerBase_1 = require("./controllerBase");
 class ProjectController extends controllerBase_1.ControllerBase {
     constructor() {
         super();
-        this.prismaClient = new prismaClient_1.Prisma().getPrismaClient();
     }
     read(userInfo, take, skip) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +31,17 @@ class ProjectController extends controllerBase_1.ControllerBase {
             const result = yield this.prismaClient.project.findMany({
                 take,
                 skip,
-                where: condition
+                where: condition,
+                include: {
+                    media: {
+                        orderBy: {
+                            orderIndex: 'asc'
+                        }
+                    }
+                }
+            });
+            result.forEach(project => {
+                this.addAvatarField(project);
             });
             return result;
         });
@@ -179,6 +187,11 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 };
             }
         });
+    }
+    addAvatarField(project) {
+        if (project.media !== undefined && project.media.length >= 0) {
+            project.avatar = project.media[0].src;
+        }
     }
 }
 exports.default = ProjectController;

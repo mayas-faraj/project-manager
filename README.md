@@ -18,28 +18,29 @@ the result of api:
 {
 "message": "user is empty",
 "token": "",
-"status": false
+"success": false
 }
 ```
 ```json
 {
 "message": "password is empty",
 "token": "",
-"status": false
+"success": false
 }
 ```
 ```json
 {
 "message": "password is not valid",
 "token": "",
-"status": false
+"success": false
 }
 ```
 ```json
 {
 "message": "login success",
 "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtIjoibWF5YXMiLCJyb2wiOiJWSUVXRVIiLCJleHAiOjE2NzM2NzA1NTUuNDUxLCJpYXQiOjE2NzM2NjY5NTV9.sNUIGhRGlxVBt50TSET1eiRP8Jk5eg3beQIuUK7a46U",
-"status": true
+"success": true,
+"role": "ADMIN"
 }
 ```
 

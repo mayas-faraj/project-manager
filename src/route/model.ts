@@ -19,6 +19,19 @@ const models = [
   { route: 'projects', controller: new ProjectController() }
 ]
 
+const stripFields = (model: object): void => {
+  const inputModel = model as Partial<Model>
+  const keys = Object.keys(model) as Array<keyof Model>
+  for (let i: number = 0; i < keys.length; i++) {
+    if (typeof inputModel[keys[i]] === 'object') {
+      stripFields(inputModel[keys[i]] as unknown as Model)
+    } else if (keys[i].endsWith('Id') || keys[i].endsWith('password')) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete inputModel[keys[i]]
+    }
+  }
+}
+
 // generic routes
 models.forEach(model => {
   const modelRoute = '/' + model.route
@@ -29,24 +42,21 @@ models.forEach(model => {
     const skip: number | undefined = (take !== undefined && page !== undefined) ? page * take : undefined
     const result = await model.controller.read(req.userInfo, take, skip)
     if ((result as OperationResult).message === undefined) {
-      const modelResult: Model[] = result as Model[]
-      modelResult.forEach((item: Model) => {
-        const keys = Object.keys(item) as Array<keyof Model>
-        for (let i: number = 0; i < keys.length; i++) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          if (keys[i].endsWith('Id') || keys[i].endsWith('password')) { delete item[keys[i]] }
-        }
-
-        return item
+      (result as Model[]).forEach(model => {
+        stripFields(model)
       })
 
-      res.json(modelResult)
+      res.json(result)
     } else { res.json(result) }
   })
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   router.get(modelRoute + '/:id([0-9]+)', async (req: Request, res: Response) => {
-    res.json(await model.controller.find(req.userInfo, parseInt(req.params.id)))
+    const result = await model.controller.find(req.userInfo, parseInt(req.params.id))
+    if (result !== null && (result as OperationResult).message === undefined) {
+      stripFields(result)
+    }
+    res.json(result)
   })
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises

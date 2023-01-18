@@ -28,6 +28,19 @@ const models = [
     { route: 'users', controller: new userController_1.default() },
     { route: 'projects', controller: new projectController_1.default() }
 ];
+const stripFields = (model) => {
+    const inputModel = model;
+    const keys = Object.keys(model);
+    for (let i = 0; i < keys.length; i++) {
+        if (typeof inputModel[keys[i]] === 'object') {
+            stripFields(inputModel[keys[i]]);
+        }
+        else if (keys[i].endsWith('Id') || keys[i].endsWith('password')) {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete inputModel[keys[i]];
+        }
+    }
+};
 // generic routes
 models.forEach(model => {
     const modelRoute = '/' + model.route;
@@ -38,18 +51,10 @@ models.forEach(model => {
         const skip = (take !== undefined && page !== undefined) ? page * take : undefined;
         const result = yield model.controller.read(req.userInfo, take, skip);
         if (result.message === undefined) {
-            const modelResult = result;
-            modelResult.forEach((item) => {
-                const keys = Object.keys(item);
-                for (let i = 0; i < keys.length; i++) {
-                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                    if (keys[i].endsWith('Id') || keys[i].endsWith('password')) {
-                        delete item[keys[i]];
-                    }
-                }
-                return item;
+            result.forEach(model => {
+                stripFields(model);
             });
-            res.json(modelResult);
+            res.json(result);
         }
         else {
             res.json(result);
@@ -57,7 +62,11 @@ models.forEach(model => {
     }));
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     router.get(modelRoute + '/:id([0-9]+)', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        res.json(yield model.controller.find(req.userInfo, parseInt(req.params.id)));
+        const result = yield model.controller.find(req.userInfo, parseInt(req.params.id));
+        if (result !== null && result.message === undefined) {
+            stripFields(result);
+        }
+        res.json(result);
     }));
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     router.post(modelRoute, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

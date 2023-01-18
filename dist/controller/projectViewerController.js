@@ -1,10 +1,14 @@
-import { Department } from '@prisma/client'
+"use strict";
+/*
+import { ProjectViewer, PrismaClient } from '@prisma/client'
+import { Prisma } from '../prismaClient'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
 
-export default class DepartmentController extends ControllerBase {
+export default class ProjectViewerController extends ControllerBase {
   public constructor () {
     super()
+    this.prismaClient = new Prisma().getPrismaClient()
   }
 
   public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
@@ -13,7 +17,7 @@ export default class DepartmentController extends ControllerBase {
     if (userInfo.rol === 'VIEWER') {
       return {
         success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't read departments`
+        message: `user: ${userInfo.nam} is under role <viewr> and cann't read users who can view project`
       }
     } else if (userInfo.rol === 'PROJECT_MANAGER') {
       condition = {
@@ -21,7 +25,7 @@ export default class DepartmentController extends ControllerBase {
       }
     }
 
-    const result: Department[] = await this.prismaClient.department.findMany({
+    const result: ProjectViewer[] = await this.prismaClient.projectViewer.findMany({
       take,
       skip,
       where: condition
@@ -35,19 +39,16 @@ export default class DepartmentController extends ControllerBase {
     if (userInfo.rol === 'VIEWER') {
       return {
         success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't search for department`
+        message: `user: ${userInfo.nam} is under role <viewr> and cann't search for projectViewer`
       }
     } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
 
-    const result: Department | null = await this.prismaClient.department.findFirst({
+    const result: ProjectViewer | null = await this.prismaClient.projectViewer.findFirst({
       where: {
         AND: {
           id,
           creatorId
         }
-      },
-      include: {
-        engineers: true
       }
     })
 
@@ -58,21 +59,21 @@ export default class DepartmentController extends ControllerBase {
     if (userInfo.rol === 'VIEWER') {
       return {
         success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't create department`
+        message: `user: ${userInfo.nam} is under role <viewr> and cann't create projectViewer`
       }
     }
 
-    const departmentData = data as Department
-    departmentData.creatorId = userInfo.id
+    const projectViewerData = data as ProjectViewer
+    projectViewerData.creatorId = userInfo.id
 
-    const result = await this.prismaClient.department.create({
-      data: data as Department
+    const result = await this.prismaClient.projectViewer.create({
+      data: data as ProjectViewer
     })
 
     if (result !== undefined) {
       return {
         success: true,
-        message: 'department has been created'
+        message: 'projectViewer has been created'
       }
     } else {
       return {
@@ -88,12 +89,12 @@ export default class DepartmentController extends ControllerBase {
     if (userInfo.rol === 'VIEWER') {
       return {
         success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't update department`
+        message: `user: ${userInfo.nam} is under role <viewr> and cann't update projectViewer`
       }
     } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
 
     try {
-      const result = await this.prismaClient.department.updateMany({
+      const result = await this.prismaClient.projectViewer.updateMany({
         where: {
           AND: {
             id,
@@ -106,18 +107,18 @@ export default class DepartmentController extends ControllerBase {
       if (result.count > 0) {
         return {
           success: true,
-          message: 'department has been updated'
+          message: 'projectViewer has been updated'
         }
       } else {
         return {
           success: false,
-          message: `department ${id} not found or user: ${userInfo.nam} is cann't update the department, or no update will made`
+          message: `projectViewer ${id} not found or user: ${userInfo.nam} is cann't update the projectViewer, or no update will made`
         }
       }
     } catch (ex) {
       return {
         success: false,
-        message: `unique constraint error for department: ${id} or internal error`
+        message: `unique constraint error for projectViewer: ${id} or internal error`
       }
     }
   }
@@ -128,12 +129,12 @@ export default class DepartmentController extends ControllerBase {
     if (userInfo.rol === 'VIEWER') {
       return {
         success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't delete department`
+        message: `user: ${userInfo.nam} is under role <viewr> and cann't delete projectViewer`
       }
     } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
 
     try {
-      const result = await this.prismaClient.department.deleteMany({
+      const result = await this.prismaClient.projectViewer.deleteMany({
         where: {
           AND: {
             id,
@@ -145,19 +146,22 @@ export default class DepartmentController extends ControllerBase {
       if (result.count > 0) {
         return {
           success: true,
-          message: 'department has been delete'
+          message: 'projectViewer has been delete'
         }
       } else {
         return {
           success: false,
-          message: `department ${id} not found or user: ${userInfo.nam} is cann't delete the department`
+          message: `projectViewer ${id} not found or user: ${userInfo.nam} is cann't delete the projectViewer`
         }
       }
     } catch (ex) {
       return {
         success: false,
-        message: `department ${id} not found or internal error`
+        message: `projectViewer ${id} not found or internal error`
       }
     }
   }
+
+  private readonly prismaClient: PrismaClient
 }
+*/

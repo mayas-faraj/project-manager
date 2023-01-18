@@ -1,12 +1,10 @@
 import { Company, PrismaClient } from '@prisma/client'
-import { Prisma } from '../prismaClient'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
 
 export default class CompanyController extends ControllerBase {
   public constructor () {
     super()
-    this.prismaClient = new Prisma().getPrismaClient()
   }
 
   public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
@@ -162,6 +160,4 @@ export default class CompanyController extends ControllerBase {
       }
     }
   }
-
-  private readonly prismaClient: PrismaClient
 }
