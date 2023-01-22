@@ -7,7 +7,7 @@ export default class ProjectController extends ControllerBase {
     super()
   }
 
-  public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
+  public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Array<Partial<Model>> | OperationResult> {
     let condition
 
     if (userInfo.rol === 'VIEWER') {
@@ -21,16 +21,27 @@ export default class ProjectController extends ControllerBase {
       }
     }
 
-    const result: Project[] = await this.prismaClient.project.findMany({
-      take,
-      skip,
-      where: condition
-    })
+    try {
+      const result: Array<Partial<Project>> = await this.prismaClient.project.findMany({
+        take,
+        skip,
+        where: condition,
+        select: {
+          id: true,
+          name: true,
+          remark: true,
+          avatar: true,
+          status: true
+        }
+      })
 
-    return result
+      return result
+    } catch (ex: any) {
+      return this.errorResult(ex)
+    }
   }
 
-  public async find (userInfo: UserInfo, id: number): Promise<Model | OperationResult | null> {
+  public async find (userInfo: UserInfo, id: number): Promise<Partial<Model> | OperationResult | null> {
     let creatorId
 
     if (userInfo.rol === 'VIEWER') {
@@ -40,22 +51,90 @@ export default class ProjectController extends ControllerBase {
       }
     } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
 
-    const result: Project | null = await this.prismaClient.project.findFirst({
-      where: {
-        AND: {
-          id,
-          creatorId
+    try {
+      const result: Partial<Project> | null = await this.prismaClient.project.findFirst({
+        where: {
+          AND: {
+            id,
+            creatorId
+          }
+        },
+        select: {
+          id: true,
+          name: true,
+          remark: true,
+          longitude: true,
+          latitude: true,
+          companyName: true,
+          engineerName: true,
+          engineerPhone: true,
+          engineerDepartment: true,
+          avatar: true,
+          duration: true,
+          cost: true,
+          amountPaid: true,
+          status: true,
+          viewers: {
+            select: {
+              id: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true
+                }
+              }
+            }
+          },
+          suspends: {
+            select: {
+              id: true,
+              fromDate: true,
+              toDate: true,
+              description: true,
+              documentUrl: true
+            }
+          },
+          extensions: {
+            select: {
+              id: true,
+              byDuration: true,
+              description: true,
+              documentUrl: true
+            }
+          },
+          payments: {
+            select: {
+              id: true,
+              amount: true,
+              paidAt: true,
+              description: true
+            }
+          },
+          media: {
+            select: {
+              id: true,
+              src: true,
+              title: true
+            },
+            orderBy: {
+              orderIndex: 'asc'
+            }
+          },
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true
+            }
+          }
         }
-      },
-      include: {
-        suspends: true,
-        extensions: true,
-        payments: true,
-        media: true
-      }
-    })
+      })
 
-    return result
+      return result
+    } catch (ex: any) {
+      return this.errorResult(ex)
+    }
   }
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
@@ -69,20 +148,24 @@ export default class ProjectController extends ControllerBase {
     const projectData = data as Project
     projectData.creatorId = userInfo.id
 
-    const result = await this.prismaClient.project.create({
-      data: data as Project
-    })
+    try {
+      const result = await this.prismaClient.project.create({
+        data: data as Project
+      })
 
-    if (result !== undefined) {
-      return {
-        success: true,
-        message: 'project has been created'
+      if (result !== undefined) {
+        return {
+          success: true,
+          message: 'project has been created'
+        }
+      } else {
+        return {
+          success: false,
+          message: 'no data created'
+        }
       }
-    } else {
-      return {
-        success: false,
-        message: 'no data created'
-      }
+    } catch (ex: any) {
+      return this.errorResult(ex)
     }
   }
 
@@ -119,10 +202,7 @@ export default class ProjectController extends ControllerBase {
         }
       }
     } catch (ex) {
-      return {
-        success: false,
-        message: `unique constraint error for project: ${id} or internal error`
-      }
+      return this.errorResult(ex)
     }
   }
 
@@ -158,10 +238,7 @@ export default class ProjectController extends ControllerBase {
         }
       }
     } catch (ex) {
-      return {
-        success: false,
-        message: `project ${id} not found or internal error`
-      }
+      return this.errorResult(ex)
     }
   }
 }

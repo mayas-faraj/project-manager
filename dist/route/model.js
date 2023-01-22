@@ -15,28 +15,31 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController_1 = __importDefault(require("../controller/userController"));
 const projectController_1 = __importDefault(require("../controller/projectController"));
+const projectViewerController_1 = __importDefault(require("../controller/projectViewerController"));
 // define router
 const router = (0, express_1.Router)();
 // available models
 const models = [
     { route: 'users', controller: new userController_1.default() },
-    { route: 'projects', controller: new projectController_1.default() }
+    { route: 'projects', controller: new projectController_1.default() },
+    { route: 'viewers', controller: new projectViewerController_1.default() }
 ];
-const stripFields = (model) => {
-    const inputModel = model;
-    if (inputModel != null) {
-        const keys = Object.keys(model);
-        for (let i = 0; i < keys.length; i++) {
-            if (typeof inputModel[keys[i]] === 'object') {
-                stripFields(inputModel[keys[i]]);
-            }
-            else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete inputModel[keys[i]];
-            }
-        }
+/*
+const stripFields = (model: object): void => {
+  const inputModel = model as Partial<Model>
+  if (inputModel != null) {
+    const keys = Object.keys(model) as Array<keyof Model>
+    for (let i: number = 0; i < keys.length; i++) {
+      if (typeof inputModel[keys[i]] === 'object') {
+        stripFields(inputModel[keys[i]] as unknown as Model)
+      } else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete inputModel[keys[i]]
+      }
     }
-};
+  }
+}
+*/
 // generic routes
 models.forEach(model => {
     const modelRoute = '/' + model.route;
@@ -46,22 +49,11 @@ models.forEach(model => {
         const page = req.query.page !== undefined ? parseInt(req.query.page) : undefined;
         const skip = (take !== undefined && page !== undefined) ? page * take : undefined;
         const result = yield model.controller.read(req.userInfo, take, skip);
-        if (result.message === undefined) {
-            result.forEach(model => {
-                stripFields(model);
-            });
-            res.json(result);
-        }
-        else {
-            res.json(result);
-        }
+        res.json(result);
     }));
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     router.get(modelRoute + '/:id([0-9]+)', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const result = yield model.controller.find(req.userInfo, parseInt(req.params.id));
-        if (result !== null && result.message === undefined) {
-            stripFields(result);
-        }
         res.json(result);
     }));
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

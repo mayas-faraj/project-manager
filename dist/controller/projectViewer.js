@@ -34,17 +34,11 @@ class ProjectViewerController extends controllerBase_1.ControllerBase {
         return __awaiter(this, void 0, void 0, function* () {
             const viewerData = data;
             if (userInfo.rol === 'PROJECT_MANAGER') {
-                let hasProject;
-                try {
-                    hasProject = yield this.prismaClient.project.findUnique({
-                        where: {
-                            id: viewerData.projectId
-                        }
-                    });
-                }
-                catch (ex) {
-                    return this.errorResult(ex);
-                }
+                const hasProject = yield this.prismaClient.project.findUnique({
+                    where: {
+                        id: viewerData.projectId
+                    }
+                });
                 if (hasProject === undefined) {
                     return {
                         success: false,
@@ -58,25 +52,20 @@ class ProjectViewerController extends controllerBase_1.ControllerBase {
                     message: `user: ${userInfo.nam} is under role <viewr> and cann't create project viewer`
                 };
             }
-            try {
-                const result = yield this.prismaClient.projectViewer.create({
-                    data: viewerData
-                });
-                if (result !== undefined) {
-                    return {
-                        success: true,
-                        message: 'project viewer has been created'
-                    };
-                }
-                else {
-                    return {
-                        success: false,
-                        message: 'no data created'
-                    };
-                }
+            const result = yield this.prismaClient.projectViewer.create({
+                data: viewerData
+            });
+            if (result !== undefined) {
+                return {
+                    success: true,
+                    message: 'project viewer has been created'
+                };
             }
-            catch (ex) {
-                return this.errorResult(ex);
+            else {
+                return {
+                    success: false,
+                    message: 'no data created'
+                };
             }
         });
     }
@@ -91,22 +80,16 @@ class ProjectViewerController extends controllerBase_1.ControllerBase {
     drop(userInfo, id) {
         return __awaiter(this, void 0, void 0, function* () {
             if (userInfo.rol === 'PROJECT_MANAGER') {
-                let hasProject;
-                try {
-                    hasProject = yield this.prismaClient.projectViewer.findMany({
-                        where: {
-                            AND: {
-                                id,
-                                project: {
-                                    creatorId: userInfo.id
-                                }
+                const hasProject = yield this.prismaClient.projectViewer.findMany({
+                    where: {
+                        AND: {
+                            id,
+                            project: {
+                                creatorId: userInfo.id
                             }
                         }
-                    });
-                }
-                catch (ex) {
-                    return this.errorResult(ex);
-                }
+                    }
+                });
                 if (hasProject === undefined) {
                     return {
                         success: false,
@@ -120,27 +103,22 @@ class ProjectViewerController extends controllerBase_1.ControllerBase {
                     message: `user: ${userInfo.nam} is under role <viewr> and cann't create project viewer`
                 };
             }
-            try {
-                const result = yield this.prismaClient.projectViewer.delete({
-                    where: {
-                        id
-                    }
-                });
-                if (result !== undefined) {
-                    return {
-                        success: true,
-                        message: 'project viewer has been delete'
-                    };
+            const result = yield this.prismaClient.projectViewer.delete({
+                where: {
+                    id
                 }
-                else {
-                    return {
-                        success: false,
-                        message: 'no data created'
-                    };
-                }
+            });
+            if (result !== undefined) {
+                return {
+                    success: true,
+                    message: 'project viewer has been delete'
+                };
             }
-            catch (ex) {
-                return this.errorResult(ex);
+            else {
+                return {
+                    success: false,
+                    message: 'no data created'
+                };
             }
         });
     }

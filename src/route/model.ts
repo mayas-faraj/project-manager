@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
-import { Model, OperationResult } from '../types'
 import UserController from '../controller/userController'
 import ProjectController from '../controller/projectController'
+import ProjectViewerController from '../controller/projectViewerController'
 
 // define router
 const router: Router = Router()
@@ -10,9 +10,10 @@ const router: Router = Router()
 
 const models = [
   { route: 'users', controller: new UserController() },
-  { route: 'projects', controller: new ProjectController() }
+  { route: 'projects', controller: new ProjectController() },
+  { route: 'viewers', controller: new ProjectViewerController() }
 ]
-
+/*
 const stripFields = (model: object): void => {
   const inputModel = model as Partial<Model>
   if (inputModel != null) {
@@ -27,7 +28,7 @@ const stripFields = (model: object): void => {
     }
   }
 }
-
+*/
 // generic routes
 models.forEach(model => {
   const modelRoute = '/' + model.route
@@ -37,21 +38,12 @@ models.forEach(model => {
     const page: number | undefined = req.query.page !== undefined ? parseInt(req.query.page as string) : undefined
     const skip: number | undefined = (take !== undefined && page !== undefined) ? page * take : undefined
     const result = await model.controller.read(req.userInfo, take, skip)
-    if ((result as OperationResult).message === undefined) {
-      (result as Model[]).forEach(model => {
-        stripFields(model)
-      })
-
-      res.json(result)
-    } else { res.json(result) }
+    res.json(result)
   })
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   router.get(modelRoute + '/:id([0-9]+)', async (req: Request, res: Response) => {
     const result = await model.controller.find(req.userInfo, parseInt(req.params.id))
-    if (result !== null && (result as OperationResult).message === undefined) {
-      stripFields(result)
-    }
     res.json(result)
   })
 

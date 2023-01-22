@@ -35,7 +35,7 @@ model Project {
   name               String          @db.VarChar(50)
   remark             String?
   longitude          Float?
-  latitude         Float?
+  latitude           Float?
   companyName        String?         @db.VarChar(50)
   engineerName       String?         @map("engineer_name") @db.VarChar(50)
   engineerPhone      String?         @map("engineer_phone") @db.VarChar(50)
@@ -60,13 +60,14 @@ model Project {
 }
 
 model ProjectViewer {
+  id         Int      @id @default(autoincrement())
   userId     Int      @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   projectId  Int      @map("project_id")
   project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   assignedAt DateTime @default(now()) @map("assigned_at")
 
-  @@id([userId, projectId])
+  @@unique([userId, projectId])
   @@map("project_viewer")
 }
 

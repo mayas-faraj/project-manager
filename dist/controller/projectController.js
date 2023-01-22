@@ -28,12 +28,24 @@ class ProjectController extends controllerBase_1.ControllerBase {
                     creatorId: userInfo.id
                 };
             }
-            const result = yield this.prismaClient.project.findMany({
-                take,
-                skip,
-                where: condition
-            });
-            return result;
+            try {
+                const result = yield this.prismaClient.project.findMany({
+                    take,
+                    skip,
+                    where: condition,
+                    select: {
+                        id: true,
+                        name: true,
+                        remark: true,
+                        avatar: true,
+                        status: true
+                    }
+                });
+                return result;
+            }
+            catch (ex) {
+                return this.errorResult(ex);
+            }
         });
     }
     find(userInfo, id) {
@@ -48,21 +60,90 @@ class ProjectController extends controllerBase_1.ControllerBase {
             else if (userInfo.rol === 'PROJECT_MANAGER') {
                 creatorId = userInfo.id;
             }
-            const result = yield this.prismaClient.project.findFirst({
-                where: {
-                    AND: {
-                        id,
-                        creatorId
+            try {
+                const result = yield this.prismaClient.project.findFirst({
+                    where: {
+                        AND: {
+                            id,
+                            creatorId
+                        }
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        remark: true,
+                        longitude: true,
+                        latitude: true,
+                        companyName: true,
+                        engineerName: true,
+                        engineerPhone: true,
+                        engineerDepartment: true,
+                        avatar: true,
+                        duration: true,
+                        cost: true,
+                        amountPaid: true,
+                        status: true,
+                        viewers: {
+                            select: {
+                                id: true,
+                                user: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        avatar: true
+                                    }
+                                }
+                            }
+                        },
+                        suspends: {
+                            select: {
+                                id: true,
+                                fromDate: true,
+                                toDate: true,
+                                description: true,
+                                documentUrl: true
+                            }
+                        },
+                        extensions: {
+                            select: {
+                                id: true,
+                                byDuration: true,
+                                description: true,
+                                documentUrl: true
+                            }
+                        },
+                        payments: {
+                            select: {
+                                id: true,
+                                amount: true,
+                                paidAt: true,
+                                description: true
+                            }
+                        },
+                        media: {
+                            select: {
+                                id: true,
+                                src: true,
+                                title: true
+                            },
+                            orderBy: {
+                                orderIndex: 'asc'
+                            }
+                        },
+                        creator: {
+                            select: {
+                                id: true,
+                                name: true,
+                                avatar: true
+                            }
+                        }
                     }
-                },
-                include: {
-                    suspends: true,
-                    extensions: true,
-                    payments: true,
-                    media: true
-                }
-            });
-            return result;
+                });
+                return result;
+            }
+            catch (ex) {
+                return this.errorResult(ex);
+            }
         });
     }
     create(userInfo, data) {
@@ -75,20 +156,25 @@ class ProjectController extends controllerBase_1.ControllerBase {
             }
             const projectData = data;
             projectData.creatorId = userInfo.id;
-            const result = yield this.prismaClient.project.create({
-                data: data
-            });
-            if (result !== undefined) {
-                return {
-                    success: true,
-                    message: 'project has been created'
-                };
+            try {
+                const result = yield this.prismaClient.project.create({
+                    data: data
+                });
+                if (result !== undefined) {
+                    return {
+                        success: true,
+                        message: 'project has been created'
+                    };
+                }
+                else {
+                    return {
+                        success: false,
+                        message: 'no data created'
+                    };
+                }
             }
-            else {
-                return {
-                    success: false,
-                    message: 'no data created'
-                };
+            catch (ex) {
+                return this.errorResult(ex);
             }
         });
     }
@@ -128,10 +214,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 }
             }
             catch (ex) {
-                return {
-                    success: false,
-                    message: `unique constraint error for project: ${id} or internal error`
-                };
+                return this.errorResult(ex);
             }
         });
     }
@@ -170,10 +253,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 }
             }
             catch (ex) {
-                return {
-                    success: false,
-                    message: `project ${id} not found or internal error`
-                };
+                return this.errorResult(ex);
             }
         });
     }

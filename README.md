@@ -172,37 +172,15 @@ if your user's role is admin, the api returns all the projects, if the user's ro
     "id": 7,
     "name": "ملعب الاتحاد",
     "remark": "ملعب كرة قدم",
-    "companyName": "شركة الأفق الدولية",
-    "engineerName": "حسان الثابت",
-    "engineerPhone": "0933123123",
-    "engineerDepartment": "قسم البحوث العلمية",
-    "avatar": "/uploads/imgs/project2-1.jpg",
-    "duration": 450,
-    "cost": "1100000000",
-    "amountPaid": "340000000",
-    "longitude": 44.309062,
-    "latitude": 32.041784,
-    "status": "WORKING",
-    "createdAt": "2023-01-18T18:38:37.823Z",
-    "updatedAt": "2023-01-18T18:38:37.823Z"
+    "avatar": "/imgs/projects/project2-1.jpg",
+    "status": "WORKING"
   },
   {
     "id": 8,
     "name": "ساحة الحياة",
     "remark": "ساحة وسط المحافظة مزودة بنوافير لضخ المياة وحديقة ازهار",
-    "companyName": "شركة جلجامش",
-    "engineerName": "علي الاسمر",
-    "engineerPhone": "09656578",
-    "engineerDepartment": "دائرة التعمير",
-    "avatar": "/uploads/imgs/project3-1.jpg",
-    "duration": 250,
-    "cost": "200000000",
-    "amountPaid": "100000000",
-    "longitude": 44.309062,
-    "latitude": 32.041784,
-    "status": "LATE",
-    "createdAt": "2023-01-18T18:38:37.846Z",
-    "updatedAt": "2023-01-18T18:38:37.846Z"
+    "avatar": "/imgs/projects/project3-1.jpg",
+    "status": "LATE"
   }
 ]
 ```
@@ -226,6 +204,85 @@ read specific project, for example project with id: 2
 ```bash
 curl -X GET -H 'Authorization: Bearer <TOKEN>' http://<DOMAIN>:4000/api/projects/2
 ```
+the result's form like the json data below:
+```json
+{
+  "id": 9,
+  "name": "مشفى الامل",
+  "remark": "مشفى عامل لعلاج جميع الامراض",
+  "longitude": 44.302062,
+  "latitude": 32.041384,
+  "companyName": "شركة تعمير العراق",
+  "engineerName": "عادل الحموي",
+  "engineerPhone": "09776655",
+  "engineerDepartment": "دائرة الهندسة المعمارية",
+  "avatar": "/imgs/projects/project4-1.jpg",
+  "duration": 180,
+  "cost": "1200000000",
+  "amountPaid": "400000000",
+  "status": "WORKING",
+  "viewers": [
+    {
+      "id": 2,
+      "user": {
+        "id": 3,
+        "name": "mayas",
+        "avatar": "/imgs/users/mayas.png"
+      }
+    },
+    {
+      "id": 3,
+      "user": {
+        "id": 2,
+        "name": "zaher",
+        "avatar": "/imgs/users/zaher.png"
+      }
+    }
+  ],
+  "suspends": [],
+  "extensions": [],
+  "payments": [
+    {
+      "id": 27,
+      "amount": "1000000",
+      "paidAt": "2023-01-22T04:13:18.799Z",
+      "description": "افتتاح المشروع"
+    },
+    {
+      "id": 28,
+      "amount": "3000000",
+      "paidAt": "2023-01-22T04:13:18.799Z",
+      "description": "بناء الجوائز"
+    },
+    {
+      "id": 29,
+      "amount": "4000000",
+      "paidAt": "2023-01-22T04:13:18.799Z",
+      "description": ""
+    }
+  ],
+  "media": [
+    {
+      "id": 15,
+      "src": "/imgs/projects/project4-2.png",
+      "title": "منظر رئيسي"
+    },
+    {
+      "id": 16,
+      "src": "/imgs/projects/project4-3.png",
+      "title": ""
+    }
+  ],
+  "creator": {
+    "id": 1,
+    "name": "administrator",
+    "avatar": "/imgs/users/admin.png"
+  }
+}
+```
+viewers sub-data container list of users who has privelege to view project, and createor sub-data represents the info of user who create the project.
+
+
 update project:
 you will add the field what you need to update only, for example, update excerpt and avatar, and provide the project id
 ```bash
@@ -239,6 +296,35 @@ curl -X DELETE -H 'Authorization: Bearer <TOKEN>' http://<DOMAIN>:4000/api/proje
 ```
 project has sub items, each project contain media, suspend and payments, each one has a seperate api
 
+## Project viewer
+the project viewers is users with the permissions to display project info (read-only), the list of viewers can be displayed by using the project api.
+to add user to project as viewer, we should have the user id and the project id and then using the api:
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at -d '{"projectId": 9, "userId": 2}' http://$url:4000/api/viewers 
+```
+if the user added successfully, the api return this message:
+```json
+{
+  "success": true,
+  "message": "project viewer has been created"
+}
+```
+or if there are error, look like the user is added before:
+```json
+{
+  "success": false,
+  "message": "server error: <ERROR>"
+}
+```
+
+to delete the project viewer, we should have viewer id - not user id, you can use this api:
+```bash
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/viewers/2 
+```
+if the operation success, the result should be:
+```json
+{"success":true,"message":"project viewer has been delete"}
+```
 ## Media
 comming soon...
 

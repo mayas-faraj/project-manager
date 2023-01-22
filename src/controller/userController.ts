@@ -8,7 +8,7 @@ export default class UserController extends ControllerBase {
     super()
   }
 
-  public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Model[] | OperationResult> {
+  public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Array<Partial<Model>> | OperationResult> {
     if (userInfo.rol !== 'ADMIN') {
       return {
         success: false,
@@ -16,19 +16,49 @@ export default class UserController extends ControllerBase {
       }
     }
 
-    const result: User[] = await this.prismaClient.user.findMany({
+    const result: Array<Partial<User>> = await this.prismaClient.user.findMany({
       take,
-      skip
+      skip,
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        role: true,
+        lastLoginAt: true
+      }
     })
     return result
   }
 
-  public async find (userInfo: UserInfo, id: number): Promise<Model | OperationResult | null> {
+  public async find (userInfo: UserInfo, id: number): Promise<Partial<Model> | OperationResult | null> {
     if (userInfo.rol === 'ADMIN' || (id === 0)) {
       try {
         const condition = { id: id !== 0 ? id : userInfo.id }
         const result = await this.prismaClient.user.findFirst({
-          where: condition
+          where: condition,
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            lastLoginAt: true,
+            role: true,
+            createdProjects: {
+              select: {
+                name: true,
+                avatar: true
+              }
+            },
+            viewingProjects: {
+              select: {
+                project: {
+                  select: {
+                    name: true,
+                    avatar: true
+                  }
+                }
+              }
+            }
+          }
         })
 
         return result

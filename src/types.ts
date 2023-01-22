@@ -1,4 +1,4 @@
-import { User, Project, Media, Suspend, Payment, Extensions } from '@prisma/client'
+import { User, Project, Media, Suspend, Payment, Extensions, ProjectViewer } from '@prisma/client'
 
 // declare interface
 declare global {
@@ -13,7 +13,7 @@ declare global {
 export interface UserInfo {
   id: number
   nam: string
-  rol: string
+  rol: 'ADMIN' | 'PROJECT_MANAGER' | 'VIEWER'
 }
 
 export interface OperationResult {
@@ -21,4 +21,4 @@ export interface OperationResult {
   message: string
 }
 
-export type Model = User | Project | Media | Suspend | Payment | Extensions
+export type Model = User | Project | Media | Suspend | Payment | Extensions | ProjectViewer

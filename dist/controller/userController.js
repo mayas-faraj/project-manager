@@ -25,7 +25,14 @@ class UserController extends controllerBase_1.ControllerBase {
             }
             const result = yield this.prismaClient.user.findMany({
                 take,
-                skip
+                skip,
+                select: {
+                    id: true,
+                    name: true,
+                    avatar: true,
+                    role: true,
+                    lastLoginAt: true
+                }
             });
             return result;
         });
@@ -36,7 +43,30 @@ class UserController extends controllerBase_1.ControllerBase {
                 try {
                     const condition = { id: id !== 0 ? id : userInfo.id };
                     const result = yield this.prismaClient.user.findFirst({
-                        where: condition
+                        where: condition,
+                        select: {
+                            id: true,
+                            name: true,
+                            avatar: true,
+                            lastLoginAt: true,
+                            role: true,
+                            createdProjects: {
+                                select: {
+                                    name: true,
+                                    avatar: true
+                                }
+                            },
+                            viewingProjects: {
+                                select: {
+                                    project: {
+                                        select: {
+                                            name: true,
+                                            avatar: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     });
                     return result;
                 }
