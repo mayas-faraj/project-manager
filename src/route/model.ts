@@ -1,34 +1,15 @@
 import { Router, Request, Response } from 'express'
 import UserController from '../controller/userController'
 import ProjectController from '../controller/projectController'
-import ProjectViewerController from '../controller/projectViewerController'
-
 // define router
 const router: Router = Router()
 
 // available models
-
 const models = [
   { route: 'users', controller: new UserController() },
-  { route: 'projects', controller: new ProjectController() },
-  { route: 'viewers', controller: new ProjectViewerController() }
+  { route: 'projects', controller: new ProjectController() }
 ]
-/*
-const stripFields = (model: object): void => {
-  const inputModel = model as Partial<Model>
-  if (inputModel != null) {
-    const keys = Object.keys(model) as Array<keyof Model>
-    for (let i: number = 0; i < keys.length; i++) {
-      if (typeof inputModel[keys[i]] === 'object') {
-        stripFields(inputModel[keys[i]] as unknown as Model)
-      } else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete inputModel[keys[i]]
-      }
-    }
-  }
-}
-*/
+
 // generic routes
 models.forEach(model => {
   const modelRoute = '/' + model.route

@@ -8,21 +8,21 @@ export default class ProjectController extends ControllerBase {
   }
 
   public async read (userInfo: UserInfo, take?: number | undefined, skip?: number | undefined): Promise<Array<Partial<Model>> | OperationResult> {
+    // precondition: none
+
+    // checking privileges
     let condition
 
-    if (userInfo.rol === 'VIEWER') {
-      return {
-        success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't read projects`
-      }
-    } else if (userInfo.rol === 'PROJECT_MANAGER') {
+    if (userInfo.rol === 'PROJECT_MANAGER') {
       condition = {
         creatorId: userInfo.id
       }
     }
 
+    // critical operation
+    let result: Array<Partial<Project>>
     try {
-      const result: Array<Partial<Project>> = await this.prismaClient.project.findMany({
+      result = await this.prismaClient.project.findMany({
         take,
         skip,
         where: condition,
@@ -34,30 +34,35 @@ export default class ProjectController extends ControllerBase {
           status: true
         }
       })
-
-      return result
     } catch (ex: any) {
       return this.errorResult(ex)
     }
+
+    return result
   }
 
   public async find (userInfo: UserInfo, id: number): Promise<Partial<Model> | OperationResult | null> {
-    let creatorId
+    // precondition: none
 
-    if (userInfo.rol === 'VIEWER') {
-      return {
-        success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't search for project`
-      }
-    } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
+    // checking priveleges
+    const condition: {
+      id: number
+      creatorId: number | undefined
+    } = {
+      id,
+      creatorId: undefined
+    }
 
+    if (userInfo.rol === 'PROJECT_MANAGER') {
+      condition.creatorId = userInfo.id
+    }
+
+    // critical operation
+    let result: Partial<Project> | null
     try {
-      const result: Partial<Project> | null = await this.prismaClient.project.findFirst({
+      result = await this.prismaClient.project.findFirst({
         where: {
-          AND: {
-            id,
-            creatorId
-          }
+          AND: condition
         },
         select: {
           id: true,
@@ -74,18 +79,6 @@ export default class ProjectController extends ControllerBase {
           cost: true,
           amountPaid: true,
           status: true,
-          viewers: {
-            select: {
-              id: true,
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  avatar: true
-                }
-              }
-            }
-          },
           suspends: {
             select: {
               id: true,
@@ -130,115 +123,133 @@ export default class ProjectController extends ControllerBase {
           }
         }
       })
-
-      return result
     } catch (ex: any) {
       return this.errorResult(ex)
     }
+
+    return result
   }
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
-    if (userInfo.rol === 'VIEWER') {
-      return {
-        success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't create project`
-      }
-    }
+    // precondition
+    const missingFields = this.requiredResult(data, 'name', 'cost', 'amountPaid', 'duration')
+    if (missingFields !== false) return missingFields
 
+    // checking privelege
+    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+
+    // critical operation
     const projectData = data as Project
     projectData.creatorId = userInfo.id
-
+    let result
     try {
-      const result = await this.prismaClient.project.create({
+      result = await this.prismaClient.project.create({
         data: data as Project
       })
-
-      if (result !== undefined) {
-        return {
-          success: true,
-          message: 'project has been created'
-        }
-      } else {
-        return {
-          success: false,
-          message: 'no data created'
-        }
-      }
     } catch (ex: any) {
       return this.errorResult(ex)
+    }
+
+    // post condition
+    if (result !== undefined) {
+      return {
+        success: true,
+        message: 'project has been created'
+      }
+    } else {
+      return {
+        success: false,
+        message: 'no data created'
+      }
     }
   }
 
   public async update (userInfo: UserInfo, id: number, data: Object): Promise<OperationResult> {
-    let creatorId
+    // precondition: none
 
-    if (userInfo.rol === 'VIEWER') {
-      return {
-        success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't update project`
-      }
-    } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
+    // checking privelege
+    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
+    const condition: {
+      id: number
+      creatorId: number | undefined
+    } = {
+      id,
+      creatorId: undefined
+    }
+
+    if (userInfo.rol === 'PROJECT_MANAGER') {
+      condition.creatorId = userInfo.id
+    }
+
+    // critical operatoin
+    let result
     try {
-      const result = await this.prismaClient.project.updateMany({
+      result = await this.prismaClient.project.updateMany({
         where: {
-          AND: {
-            id,
-            creatorId
-          }
+          AND: condition
         },
         data
       })
-
-      if (result.count > 0) {
-        return {
-          success: true,
-          message: 'project has been updated'
-        }
-      } else {
-        return {
-          success: false,
-          message: `project ${id} not found or user: ${userInfo.nam} is cann't update the project, or no update will made`
-        }
-      }
     } catch (ex) {
       return this.errorResult(ex)
+    }
+
+    // post condition
+    if (result.count > 0) {
+      return {
+        success: true,
+        message: 'project has been updated'
+      }
+    } else {
+      return {
+        success: false,
+        message: `project ${id} not found or user: ${userInfo.nam} is cann't update the project, or no update will made`
+      }
     }
   }
 
   public async drop (userInfo: UserInfo, id: number): Promise<OperationResult> {
-    let creatorId
+    // precondition: none
 
-    if (userInfo.rol === 'VIEWER') {
-      return {
-        success: false,
-        message: `user: ${userInfo.nam} is under role <viewr> and cann't delete project`
-      }
-    } else if (userInfo.rol === 'PROJECT_MANAGER') { creatorId = userInfo.id }
+    // checking privelege
+    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
+    const condition: {
+      id: number
+      creatorId: number | undefined
+    } = {
+      id,
+      creatorId: undefined
+    }
+
+    if (userInfo.rol === 'PROJECT_MANAGER') {
+      condition.creatorId = userInfo.id
+    }
+
+    // critical operatoin
+    let result
     try {
-      const result = await this.prismaClient.project.deleteMany({
+      result = await this.prismaClient.project.deleteMany({
         where: {
-          AND: {
-            id,
-            creatorId
-          }
+          AND: condition
         }
       })
-
-      if (result.count > 0) {
-        return {
-          success: true,
-          message: 'project has been delete'
-        }
-      } else {
-        return {
-          success: false,
-          message: `project ${id} not found or user: ${userInfo.nam} is cann't delete the project`
-        }
-      }
     } catch (ex) {
       return this.errorResult(ex)
+    }
+
+    // post condition
+    if (result.count > 0) {
+      return {
+        success: true,
+        message: 'project has been delete'
+      }
+    } else {
+      return {
+        success: false,
+        message: `project ${id} not found or user: ${userInfo.nam} is cann't delete the project`
+      }
     }
   }
 }

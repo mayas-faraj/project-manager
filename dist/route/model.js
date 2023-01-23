@@ -15,31 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController_1 = __importDefault(require("../controller/userController"));
 const projectController_1 = __importDefault(require("../controller/projectController"));
-const projectViewerController_1 = __importDefault(require("../controller/projectViewerController"));
 // define router
 const router = (0, express_1.Router)();
 // available models
 const models = [
     { route: 'users', controller: new userController_1.default() },
-    { route: 'projects', controller: new projectController_1.default() },
-    { route: 'viewers', controller: new projectViewerController_1.default() }
+    { route: 'projects', controller: new projectController_1.default() }
 ];
-/*
-const stripFields = (model: object): void => {
-  const inputModel = model as Partial<Model>
-  if (inputModel != null) {
-    const keys = Object.keys(model) as Array<keyof Model>
-    for (let i: number = 0; i < keys.length; i++) {
-      if (typeof inputModel[keys[i]] === 'object') {
-        stripFields(inputModel[keys[i]] as unknown as Model)
-      } else if ((Boolean(keys[i].endsWith('Id'))) || (Boolean(keys[i].endsWith('password')))) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete inputModel[keys[i]]
-      }
-    }
-  }
-}
-*/
 // generic routes
 models.forEach(model => {
     const modelRoute = '/' + model.route;

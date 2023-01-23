@@ -17,88 +17,96 @@ class UserController extends controllerBase_1.ControllerBase {
     }
     read(userInfo, take, skip) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol !== 'ADMIN') {
-                return {
-                    success: false,
-                    message: `user: ${userInfo.nam} is under role <viewr> or <project-manager> and cann't read users`
-                };
+            // precondition: none
+            // chekking priveleges
+            if (userInfo.rol !== 'ADMIN')
+                return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
+            // critical operation
+            let result;
+            try {
+                result = yield this.prismaClient.user.findMany({
+                    take,
+                    skip,
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar: true,
+                        role: true,
+                        lastLoginAt: true
+                    }
+                });
             }
-            const result = yield this.prismaClient.user.findMany({
-                take,
-                skip,
-                select: {
-                    id: true,
-                    name: true,
-                    avatar: true,
-                    role: true,
-                    lastLoginAt: true
-                }
-            });
+            catch (ex) {
+                return this.errorResult(ex);
+            }
             return result;
         });
     }
     find(userInfo, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol === 'ADMIN' || (id === 0)) {
-                try {
-                    const condition = { id: id !== 0 ? id : userInfo.id };
-                    const result = yield this.prismaClient.user.findFirst({
-                        where: condition,
-                        select: {
-                            id: true,
-                            name: true,
-                            avatar: true,
-                            lastLoginAt: true,
-                            role: true,
-                            createdProjects: {
-                                select: {
-                                    name: true,
-                                    avatar: true
-                                }
-                            },
-                            viewingProjects: {
-                                select: {
-                                    project: {
-                                        select: {
-                                            name: true,
-                                            avatar: true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                    return result;
-                }
-                catch (ex) {
-                    return {
-                        success: false,
-                        message: `server site error for user while finding user: ${id} `
-                    };
-                }
-            }
+            // precondition: none
+            // checking priveleges
+            let recordId;
+            if (userInfo.rol === 'ADMIN' || (id === 0))
+                recordId = id !== 0 ? id : userInfo.id;
             else {
                 return {
                     success: false,
                     message: `user: ${userInfo.nam} is not admin and not the same user to fetch`
                 };
             }
+            // critical operation
+            try {
+                const result = yield this.prismaClient.user.findFirst({
+                    where: {
+                        id: recordId
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar: true,
+                        lastLoginAt: true,
+                        role: true,
+                        createdAt: true,
+                        createdProjects: {
+                            select: {
+                                name: true,
+                                avatar: true
+                            }
+                        }
+                    }
+                });
+                return result;
+            }
+            catch (ex) {
+                return {
+                    success: false,
+                    message: `server site error for user while finding user: ${id}`
+                };
+            }
         });
     }
     create(userInfo, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol !== 'ADMIN') {
-                return {
-                    success: false,
-                    message: `user: ${userInfo.nam} is under role <viewr> or <project-manager> and cann't create user`
-                };
-            }
+            // precondition
+            const missingFields = this.requiredResult(data, 'name', 'password', 'role');
+            if (missingFields !== false)
+                return missingFields;
+            // checking privelege
+            if (userInfo.rol !== 'ADMIN')
+                return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
+            // critical operations
             const userData = data;
-            if (userData.password !== undefined)
-                userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
-            const result = yield this.prismaClient.user.create({
-                data: userData
-            });
+            let result;
+            try {
+                result = yield this.prismaClient.user.create({
+                    data: userData
+                });
+            }
+            catch (ex) {
+                return this.errorResult(ex);
+            }
+            // post condition
             if (result !== undefined) {
                 return {
                     success: true,
@@ -108,77 +116,68 @@ class UserController extends controllerBase_1.ControllerBase {
             else {
                 return {
                     success: false,
-                    message: 'no data created'
+                    message: 'no entity created'
                 };
             }
         });
     }
     update(userInfo, id, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol === 'ADMIN' || (id === 0)) {
-                try {
-                    const condition = { id: id !== 0 ? id : userInfo.id };
-                    const userData = data;
-                    if (userData.password !== undefined)
-                        userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
-                    const result = yield this.prismaClient.user.update({
-                        where: condition,
-                        data
-                    });
-                    if (result !== undefined) {
-                        return {
-                            success: true,
-                            message: 'user has been updated'
-                        };
-                    }
-                    else {
-                        return {
-                            success: false,
-                            message: `user ${id} not found or user: ${userInfo.nam} is cann't update the user, or no update will made`
-                        };
-                    }
-                }
-                catch (ex) {
-                    return {
-                        success: false,
-                        message: `unique constraint error for user: ${id} or internal error`
-                    };
-                }
+            // precondition: none
+            // checking privelege
+            if (userInfo.rol !== 'ADMIN' && id !== 0) {
+                return {
+                    success: false,
+                    message: `user: ${userInfo.nam} is not admin and not the same user to update`
+                };
+            }
+            // critical operatoin
+            const userData = data;
+            if (userData.password !== undefined)
+                userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
+            const condition = { id: id !== 0 ? id : userInfo.id };
+            let result;
+            try {
+                result = yield this.prismaClient.user.update({
+                    where: condition,
+                    data
+                });
+            }
+            catch (ex) {
+                return {
+                    success: false,
+                    message: `unique constraint error for user: ${id} or internal error`
+                };
+            }
+            // post condition
+            if (result !== undefined) {
+                return {
+                    success: true,
+                    message: 'user has been updated'
+                };
             }
             else {
                 return {
                     success: false,
-                    message: `user: ${userInfo.nam} is not admin and not the same user to update`
+                    message: `user ${id} not found or user: ${userInfo.nam} is cann't update the user, or no update will made`
                 };
             }
         });
     }
     drop(userInfo, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (userInfo.rol !== 'ADMIN') {
-                return {
-                    success: false,
-                    message: `user: ${userInfo.nam} is under role <viewr> or <project-manager> and cann't delete user`
-                };
-            }
+            // precondition: none
+            //  checking priveleges
+            if (userInfo.rol !== 'ADMIN')
+                return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
+            // critical operatoin
+            let result;
             try {
-                const result = yield this.prismaClient.user.delete({
+                result = yield this.prismaClient.user.delete({
                     where: {
                         id
                     }
                 });
-                if (result !== undefined) {
-                    return {
-                        success: true,
-                        message: 'user has been delete'
-                    };
-                }
-                else {
-                    return {
-                        success: false,
-                        message: `user ${id} not found or user: ${userInfo.nam} is cann't delete the user`
-                    };
-                }
             }
             catch (ex) {
                 return {
@@ -186,15 +185,36 @@ class UserController extends controllerBase_1.ControllerBase {
                     message: `user ${id} not found or internal error`
                 };
             }
+            // post condition
+            if (result !== undefined) {
+                return {
+                    success: true,
+                    message: 'user has been delete'
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    message: `user ${id} not found or user: ${userInfo.nam} is cann't delete the user`
+                };
+            }
         });
     }
     findByName(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.prismaClient.user.findUnique({
-                where: {
-                    name
-                }
-            });
+            // precondition: none
+            // critical operation
+            let result;
+            try {
+                result = yield this.prismaClient.user.findUnique({
+                    where: {
+                        name
+                    }
+                });
+            }
+            catch (ex) {
+                return null;
+            }
             return result !== null && result !== void 0 ? result : null;
         });
     }

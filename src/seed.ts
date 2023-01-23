@@ -6,7 +6,6 @@ async function main (): Promise<void> {
   await prisma.suspend.deleteMany({})
   await prisma.payment.deleteMany({})
   await prisma.media.deleteMany({})
-  await prisma.projectViewer.deleteMany({})
   await prisma.project.deleteMany({})
   await prisma.user.deleteMany({})
 
@@ -195,11 +194,6 @@ async function main (): Promise<void> {
       engineerName: 'علي الاسمر',
       engineerPhone: '09656578',
       engineerDepartment: 'دائرة التعمير',
-      viewers: {
-        create: {
-          userId: 3
-        }
-      },
       media: {
         createMany: {
           data: [
@@ -263,11 +257,6 @@ async function main (): Promise<void> {
       engineerName: 'عادل الحموي',
       engineerPhone: '09776655',
       engineerDepartment: 'دائرة الهندسة المعمارية',
-      viewers: {
-        create: {
-          userId: 3
-        }
-      },
       media: {
         createMany: {
           data: [

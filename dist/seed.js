@@ -17,7 +17,6 @@ function main() {
         yield prisma.suspend.deleteMany({});
         yield prisma.payment.deleteMany({});
         yield prisma.media.deleteMany({});
-        yield prisma.projectViewer.deleteMany({});
         yield prisma.project.deleteMany({});
         yield prisma.user.deleteMany({});
         result = yield prisma.user.createMany({
@@ -199,11 +198,6 @@ function main() {
                 engineerName: 'علي الاسمر',
                 engineerPhone: '09656578',
                 engineerDepartment: 'دائرة التعمير',
-                viewers: {
-                    create: {
-                        userId: 3
-                    }
-                },
                 media: {
                     createMany: {
                         data: [
@@ -265,11 +259,6 @@ function main() {
                 engineerName: 'عادل الحموي',
                 engineerPhone: '09776655',
                 engineerDepartment: 'دائرة الهندسة المعمارية',
-                viewers: {
-                    create: {
-                        userId: 3
-                    }
-                },
                 media: {
                     createMany: {
                         data: [
