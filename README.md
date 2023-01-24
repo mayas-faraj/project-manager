@@ -81,6 +81,21 @@ if the operation success, the message should returned from server:
 
 the avatar should have valid image url, you can upload the image of users to this api endpoint: http://<DOMAIN>:4000/user-image
 and the app should send the authorization key by header, as the same as sending any other request,
+the request type is post, and content type is (multipart/formdata) and the response contain basic informations about uploaded image.
+```json
+{
+  "fieldname":"avatar",
+  "originalname":"samabay.svg",
+  "encoding":"7bit",
+  "mimetype":"image/svg+xml",
+  "destination":"dist/uploads/imgs/users",
+  "filename":"img_1674554784746.svg",
+  "path":"/imgs/users/img_1674554784746.svg",
+  "size":13889}
+```
+just json the result path with the domain name and port to retrive the image, the supported extensions and type of uploaded image are:
+jpeg, jpg, png, gif, svg, and maximum size is 800KB, if the other extensions of file type was uploaded or bigger size than 800KB, the server return an error.
+
 the result of this end point is json object contains uploaded image, we should url -path- field of result as the avatar value.
 here are a code example to upload file to this endpoint using flutter.
 
