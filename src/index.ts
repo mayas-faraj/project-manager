@@ -29,18 +29,18 @@ const getMulter = (storagePath: string, namePrefix: string, allowedExtensions: R
       fileSize: maxSize
     },
     fileFilter: (req, file, callback) => {
+      console.log(file.mimetype)
       const fileTypes = allowedExtensions
       const extName = fileTypes.test(path.extname(file.originalname).toLowerCase())
-      const mimeType = fileTypes.test(file.mimetype)
-      if (extName && mimeType) callback(null, true)
+      if (extName) callback(null, true)
       else callback(new Error('Error, you can only upload image'))
     }
   })
 }
 
-const userImageMulter = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000)
-const projectImageMulter = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000)
-const docMulter = getMulter('dist/uploads/docs', 'doc_', /doc|docx|txt|xls|xlsx|pdf/, 5000000)
+const userImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000).single('avatar')
+const projectImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000).single('avatar')
+const docMiddleware = getMulter('dist/uploads/docs', 'doc_', /doc|docx|txt|xls|xlsx|pdf/, 5000000).single('doc')
 
 const fileOutput = (req: Request, res: Response): void => {
   if (req.file != null) {
@@ -62,16 +62,37 @@ app.use('/imgs/users', express.static(join(__dirname, '/uploads/imgs/users')))
 app.use('/imgs/projects', express.static(join(__dirname, '/uploads/imgs/projects')))
 app.use('/docs', express.static(join(__dirname, '/uploads/docs')))
 
-app.post('/user-image', authorizationMiddleware, userImageMulter.single('avatar'), (req: Request, res: Response) => {
-  fileOutput(req, res)
+app.post('/user-image', authorizationMiddleware, (req: Request, res: Response) => {
+  userImageMiddleware(req, res, (error: any) => {
+    if (error != null) {
+      res.json({
+        success: false,
+        message: error.message
+      })
+    } else fileOutput(req, res)
+  })
 })
 
-app.post('/project-image', authorizationMiddleware, projectImageMulter.single('avatar'), (req: Request, res: Response) => {
-  fileOutput(req, res)
+app.post('/project-image', authorizationMiddleware, (req: Request, res: Response) => {
+  projectImageMiddleware(req, res, (error: any) => {
+    if (error != null) {
+      res.json({
+        success: false,
+        message: error.message
+      })
+    } else fileOutput(req, res)
+  })
 })
 
-app.post('/project-docs', authorizationMiddleware, docMulter.single('doc'), (req: Request, res: Response) => {
-  fileOutput(req, res)
+app.post('/project-docs', authorizationMiddleware, (req: Request, res: Response) => {
+  docMiddleware(req, res, (error: any) => {
+    if (error != null) {
+      res.json({
+        success: false,
+        message: error.message
+      })
+    } else fileOutput(req, res)
+  })
 })
 
 // starting server

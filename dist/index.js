@@ -55,19 +55,19 @@ const getMulter = (storagePath, namePrefix, allowedExtensions, maxSize) => {
             fileSize: maxSize
         },
         fileFilter: (req, file, callback) => {
+            console.log(file.mimetype);
             const fileTypes = allowedExtensions;
             const extName = fileTypes.test(path_1.default.extname(file.originalname).toLowerCase());
-            const mimeType = fileTypes.test(file.mimetype);
-            if (extName && mimeType)
+            if (extName)
                 callback(null, true);
             else
                 callback(new Error('Error, you can only upload image'));
         }
     });
 };
-const userImageMulter = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000);
-const projectImageMulter = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000);
-const docMulter = getMulter('dist/uploads/docs', 'doc_', /doc|docx|txt|xls|xlsx|pdf/, 5000000);
+const userImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000).single('avatar');
+const projectImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000).single('avatar');
+const docMiddleware = getMulter('dist/uploads/docs', 'doc_', /doc|docx|txt|xls|xlsx|pdf/, 5000000).single('doc');
 const fileOutput = (req, res) => {
     var _a;
     if (req.file != null) {
@@ -88,14 +88,41 @@ app.use('/', login_1.default);
 app.use('/imgs/users', express_1.default.static((0, path_1.join)(__dirname, '/uploads/imgs/users')));
 app.use('/imgs/projects', express_1.default.static((0, path_1.join)(__dirname, '/uploads/imgs/projects')));
 app.use('/docs', express_1.default.static((0, path_1.join)(__dirname, '/uploads/docs')));
-app.post('/user-image', authorization_1.default, userImageMulter.single('avatar'), (req, res) => {
-    fileOutput(req, res);
+app.post('/user-image', authorization_1.default, (req, res) => {
+    userImageMiddleware(req, res, (error) => {
+        if (error != null) {
+            res.json({
+                success: false,
+                message: error.message
+            });
+        }
+        else
+            fileOutput(req, res);
+    });
 });
-app.post('/project-image', authorization_1.default, projectImageMulter.single('avatar'), (req, res) => {
-    fileOutput(req, res);
+app.post('/project-image', authorization_1.default, (req, res) => {
+    projectImageMiddleware(req, res, (error) => {
+        if (error != null) {
+            res.json({
+                success: false,
+                message: error.message
+            });
+        }
+        else
+            fileOutput(req, res);
+    });
 });
-app.post('/project-docs', authorization_1.default, docMulter.single('doc'), (req, res) => {
-    fileOutput(req, res);
+app.post('/project-docs', authorization_1.default, (req, res) => {
+    docMiddleware(req, res, (error) => {
+        if (error != null) {
+            res.json({
+                success: false,
+                message: error.message
+            });
+        }
+        else
+            fileOutput(req, res);
+    });
 });
 // starting server
 app.get('/', (req, res) => res.json({ message: 'server is running' }));
