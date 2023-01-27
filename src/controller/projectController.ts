@@ -31,8 +31,57 @@ export default class ProjectController extends ControllerBase {
           name: true,
           remark: true,
           avatar: true,
-          status: true
+          status: true,
+          amountPaid: true,
+          companyName: true,
+          engineerName: true,
+          engineerPhone: true,
+          engineerDepartment: true,
+          cost: true,
+          duration: true,
+          longitude: true,
+          latitude: true,
+          createdAt: true,
+          creator: {
+            select: {
+              name: true,
+              avatar: true
+            }
+          },
+          media: {
+            select: {
+              src: true,
+              title: true,
+              orderIndex: true
+            },
+            orderBy: {
+              orderIndex: 'asc'
+            }
+          },
+          extensions: {
+            select: {
+              byDuration: true,
+              description: true,
+              documentUrl: true
+            }
+          },
+          payments: {
+            select: {
+              amount: true,
+              description: true,
+              paidAt: true
+            }
+          },
+          suspends: {
+            select: {
+              description: true,
+              documentUrl: true,
+              fromDate: true,
+              toDate: true
+            }
+          }
         }
+
       })
     } catch (ex: any) {
       return this.errorResult(ex)
