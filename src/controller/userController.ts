@@ -88,6 +88,7 @@ export default class UserController extends ControllerBase {
 
     // critical operations
     const userData = data as User
+    if (userData.password !== undefined) userData.password = getPasswordHash(userData.password)
     let result
 
     try {

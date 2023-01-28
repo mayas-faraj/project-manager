@@ -17,6 +17,7 @@ model User {
   avatar            String?         @db.VarChar(250)
   lastLoginAt       DateTime?       @map("last_login_at")
   createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @map("updated_at") @updatedAt
   role              Role            @default(VIEWER)
   createdProjects   Project[]
   createdPayments   Payment[]
@@ -32,7 +33,7 @@ model User {
 model Project {
   id                 Int             @id @default(autoincrement())
   name               String          @db.VarChar(50)
-  remark             String?
+  remark             String?         @db.LongText
   longitude          Float?
   latitude           Float?
   companyName        String?         @db.VarChar(50)
@@ -47,7 +48,7 @@ model Project {
   creatorId          Int             @map("user_id")
   creator            User            @relation(fields: [creatorId], references: [id])
   createdAt          DateTime        @default(now()) @map("created_at")
-  updatedAt          DateTime        @default(now()) @map("updated_at")
+  updatedAt          DateTime        @map("updated_at") @updatedAt
   media              Media[]
   payments           Payment[]
   suspends           Suspend[]
@@ -60,7 +61,7 @@ model Project {
 model Media {
   id         Int      @id @default(autoincrement())
   src        String   @db.VarChar(500)
-  title      String   @db.VarChar(100)
+  title      String   @db.VarChar(100) 
   orderIndex Int      @default(0)
   createdAt  DateTime @default(now()) @map("created_at")
   projectId  Int      @map("project_id")

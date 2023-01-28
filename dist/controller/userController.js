@@ -97,6 +97,8 @@ class UserController extends controllerBase_1.ControllerBase {
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             // critical operations
             const userData = data;
+            if (userData.password !== undefined)
+                userData.password = (0, password_hash_1.getPasswordHash)(userData.password);
             let result;
             try {
                 result = yield this.prismaClient.user.create({
