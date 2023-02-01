@@ -22,7 +22,7 @@ model User {
   createdProjects   Project[]
   createdPayments   Payment[]
   createdSuspends   Suspend[]
-  createdExtensions Extensions[]
+  createdExtensions Extension[]
   createdMedia      Media[]
   setting           Setting[]
 
@@ -52,7 +52,7 @@ model Project {
   media              Media[]
   payments           Payment[]
   suspends           Suspend[]
-  extensions         Extensions[]
+  extensions         Extension[]
 
   @@unique([name])
   @@map("project")
@@ -61,7 +61,7 @@ model Project {
 model Media {
   id         Int      @id @default(autoincrement())
   src        String   @db.VarChar(500)
-  title      String   @db.VarChar(100) 
+  title      String?   @db.VarChar(100) 
   orderIndex Int      @default(0)
   createdAt  DateTime @default(now()) @map("created_at")
   projectId  Int      @map("project_id")
@@ -99,7 +99,7 @@ model Suspend {
   @@map("suspend")
 }
 
-model Extensions {
+model Extension {
   id          Int     @id @default(autoincrement())
   byDuration  Int     @default(0)
   description String? @db.VarChar(500)

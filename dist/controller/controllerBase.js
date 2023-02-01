@@ -19,6 +19,12 @@ class ControllerBase {
             message: `user: ${userName} is under role <${role}> and cann't perform operation`
         };
     }
+    unsupportedResult() {
+        return {
+            success: false,
+            message: 'unsupported operation'
+        };
+    }
     requiredResult(object, ...fields) {
         // precondition: none
         // checking fields

@@ -50,6 +50,7 @@ export default class ProjectController extends ControllerBase {
           },
           media: {
             select: {
+              id: true,
               src: true,
               title: true,
               orderIndex: true
@@ -60,6 +61,7 @@ export default class ProjectController extends ControllerBase {
           },
           extensions: {
             select: {
+              id: true,
               byDuration: true,
               description: true,
               documentUrl: true
@@ -67,6 +69,7 @@ export default class ProjectController extends ControllerBase {
           },
           payments: {
             select: {
+              id: true,
               amount: true,
               description: true,
               paidAt: true
@@ -74,6 +77,7 @@ export default class ProjectController extends ControllerBase {
           },
           suspends: {
             select: {
+              id: true,
               description: true,
               documentUrl: true,
               fromDate: true,
@@ -157,7 +161,8 @@ export default class ProjectController extends ControllerBase {
             select: {
               id: true,
               src: true,
-              title: true
+              title: true,
+              orderIndex: true
             },
             orderBy: {
               orderIndex: 'asc'

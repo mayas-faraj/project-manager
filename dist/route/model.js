@@ -15,12 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController_1 = __importDefault(require("../controller/userController"));
 const projectController_1 = __importDefault(require("../controller/projectController"));
+const mediaController_1 = __importDefault(require("../controller/mediaController"));
+const suspendController_1 = __importDefault(require("../controller/suspendController"));
+const extensionController_1 = __importDefault(require("../controller/extensionController"));
+const paymentController_1 = __importDefault(require("../controller/paymentController"));
 // define router
 const router = (0, express_1.Router)();
 // available models
 const models = [
     { route: 'users', controller: new userController_1.default() },
-    { route: 'projects', controller: new projectController_1.default() }
+    { route: 'projects', controller: new projectController_1.default() },
+    { route: 'media', controller: new mediaController_1.default() },
+    { route: 'suspends', controller: new suspendController_1.default() },
+    { route: 'extensions', controller: new extensionController_1.default() },
+    { route: 'payments', controller: new paymentController_1.default() }
 ];
 // generic routes
 models.forEach(model => {

@@ -135,7 +135,7 @@ class ProjectProvider {
       ),
     });
 
-    _response = await _dio.post("http://<URL>:4000/user-image", data: formData);
+    _response = await _dio.post("http://<DOMAIN>:4000/user-image", data: formData);
 
     log("test response");
     log(_response.data.toString());
@@ -315,7 +315,7 @@ project has sub items, each project contain media, suspend and payments, each on
 the project viewers is users with the permissions to display project info (read-only), the list of viewers can be displayed by using the project api.
 to add user to project as viewer, we should have the user id and the project id and then using the api:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at -d '{"projectId": 9, "userId": 2}' http://$url:4000/api/viewers 
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"projectId": 9, "userId": 2}' http://<DOMAIN>:4000/api/viewers 
 ```
 if the user added successfully, the api return this message:
 ```json
@@ -334,17 +334,661 @@ or if there are error, look like the user is added before:
 
 to delete the project viewer, we should have viewer id - not user id, you can use this api:
 ```bash
-curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/viewers/2 
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' http://<DOMAIN>:4000/api/viewers/2 
 ```
 if the operation success, the result should be:
 ```json
 {"success":true,"message":"project viewer has been delete"}
 ```
 ## Media
-comming soon...
+the media is image file for the project, the media file should upload to the server first and use the result path to store it,
+to upload media file to the server, we should use this api endpoint: http://<DOMAIN>:4000/project-image
+and the app should send the authorization key by header, as the same as sending any other request,
+the request type is post, and content type is (multipart/formdata) and the response contain basic informations about uploaded image.
+```json
+{
+  "fieldname":"avatar",
+  "originalname":"project-1.jpg",
+  "encoding":"7bit",
+  "mimetype":"image/jpeg",
+  "destination":"dist/uploads/imgs/projects",
+  "filename":"img_1674554784746.jpg",
+  "path":"/imgs/users/img_1674554784746.jpg",
+  "size":13889
+}
+```
+just json the result path with the domain name and port to retrive the image, the supported extensions and type of uploaded image are:
+jpeg, jpg, png, gif, svg, and maximum size is 800KB, if the other extensions of file type was uploaded or bigger size than 800KB, the server return an error.
+
+after uploading the image, we should use this api to save the project media:
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"projectId": 4, "title": "image title", "src": "/imgs/users/img_1674554784746.jpg", "orderIndex": 40}' http://<url>:4000/api/media
+```
+
+if the operation success, the server replay this response:
+```json
+{
+  "success": true,
+  "message": "media has been created"
+}
+```
+the title and order index are optional, order index is used to control the order of media image ascending, for example, if your use value 10, the image will be last element in the result array, and if you insert value 5 for other media, it will inserted before it.
+
+if the user's role is VIEWER, so ther server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the user's role is PROJECT_MANAGER, but he's not the owener of projectId, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: zaher is under role <PROJECT_MANAGER> and cann't perform operation"
+}
+```
+
+if the user dosn't provide (src) in the requested data, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "src is required for this opeation"
+}
+```
+
+to read all media that user able to view, we can use this api:
+```bash
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/media
+```
+
+the result example is:
+```json
+[
+  {
+    "src": "/imgs/projects/project2-1.png",
+    "title": "منظر علوي",
+    "createdAt": "2023-02-01T07:46:44.732Z",
+    "orderIndex": 0,
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "src": "/imgs/projects/project2-2.png",
+    "title": "منظر جانبي",
+    "createdAt": "2023-02-01T07:46:44.732Z",
+    "orderIndex": 0,
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "src": "/imgs/projects/project4-2.png",
+    "title": "منظر رئيسي",
+    "createdAt": "2023-02-01T07:46:44.761Z",
+    "orderIndex": 0,
+    "project": {
+      "id": 4,
+      "name": "مشفى الامل",
+      "avatar": "/imgs/projects/project4-1.jpg"
+    }
+  },
+  {
+    "src": "/imgs/projects/project4-3.png",
+    "title": "",
+    "createdAt": "2023-02-01T07:46:44.761Z",
+    "orderIndex": 0,
+    "project": {
+      "id": 4,
+      "name": "مشفى الامل",
+      "avatar": "/imgs/projects/project4-1.jpg"
+    }
+  },
+  {
+    "src": "new image from zaher.jpg",
+    "title": "any title from zaher",
+    "createdAt": "2023-02-01T07:52:38.712Z",
+    "orderIndex": 50,
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "src": "new image from zaher.jpg",
+    "title": "any title from zaher",
+    "createdAt": "2023-02-01T07:53:10.630Z",
+    "orderIndex": 50,
+    "project": {
+      "id": 3,
+      "name": "ساحة الحياة",
+      "avatar": "/imgs/projects/project3-1.jpg"
+    }
+  }
+]
+```
+
+to api for delete media:
+```bash
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/media/7
+```
+
+```json
+{
+  "success": true,
+  "message": "media has been delete"
+}
+```
+
+if there is no privelege to delete medis:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the media is not exists, or user cann't delete media (not project owner):
+```json
+{
+  "success": false,
+  "message": "media 7 not found or user: zaher is cann't delete the media"
+}
+```
 
 ## Suspend
-comming soon...
+the suspend is record contain file and date range for the project, the suspend file should upload to the server first and use the result path to store it,
+to upload suspend file to the server, we should use this api endpoint: http://<DOMAIN>:4000/project-docs
+and the app should send the authorization key by header, as the same as sending any other request, the key is (doc) instead of (avatar)
+the request type is post, and content type is (multipart/formdata) and the response contain basic informations about uploaded image.
+```json
+{
+  "fieldname":"doc",
+  "originalname":"project-1.pdf",
+  "encoding":"7bit",
+  "mimetype":"applicatoin/pdf",
+  "destination":"dist/uploads/docs/project-1.pdf",
+  "filename":"doc_1674554784746.pdf",
+  "path":"/docs/doc_1674554784746.pdf",
+  "size":13889
+}
+```
+just json the result path with the domain name and port to retrive the image, the supported extensions and type of uploaded document are:
+doc, docx, txt, xls, xlsx, pdf, and maximum size is 5MB, if the other extensions of file type was uploaded or bigger size than 5MB, the server return an error.
 
-## Payment
-comming soon...
+after uploading the image, we should use this api to save the project suspend:
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$mt -d '{"projectId": 4, "fromDate": "12/10/2019", "toDate": "12/25/2019" ,"documentUrl": "/docs/doc_1674554784746.pdf", "description": "any desc"}' http://$url:4000/api/suspends
+```
+the date format is US-date format: MM/dd/YYYY.
+
+if the operation success, the server replay this response:
+```json
+{
+  "success": true,
+  "message": "suspend has been created"
+}
+```
+
+if the user's role is VIEWER, so ther server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the user's role is PROJECT_MANAGER, but he's not the owener of projectId, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: zaher is under role <PROJECT_MANAGER> and cann't perform operation"
+}
+```
+
+if the user dosn't provide one of (projectId, fromDate, toDate) in the requested data, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "projectId, fromDate, toDate are required for this operation"
+}
+```
+
+to read all suspend that user able to view, we can use this api:
+```bash
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/suspends
+```
+
+the result example is:
+```json
+[
+  {
+    "id": 1,
+    "documentUrl": "/docs/doc-s-1.docx",
+    "fromDate": "2023-02-14T22:00:00.000Z",
+    "toDate": "2023-03-11T22:00:00.000Z",
+    "description": "نقص مواد",
+    "project": {
+      "id": 1,
+      "name": "نقابة المهندسين",
+      "avatar": "/imgs/projects/project1-1.jpg"
+    }
+  },
+  {
+    "id": 2,
+    "documentUrl": "/docs/doc-s-2.docx",
+    "fromDate": "2023-05-24T21:00:00.000Z",
+    "toDate": "2023-06-30T21:00:00.000Z",
+    "description": "ظروف جوية سيئة",
+    "project": {
+      "id": 1,
+      "name": "نقابة المهندسين",
+      "avatar": "/imgs/projects/project1-1.jpg"
+    }
+  },
+  {
+    "id": 3,
+    "documentUrl": "/docs/doc-s-3.docx",
+    "fromDate": "2023-06-04T21:00:00.000Z",
+    "toDate": "2023-08-10T21:00:00.000Z",
+    "description": "تسريح عدد كبير من موظفي الشركة",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 4,
+    "documentUrl": "/docs/doc-s-4.docx",
+    "fromDate": "2023-02-11T22:00:00.000Z",
+    "toDate": "2023-04-11T21:00:00.000Z",
+    "description": "عدم توفر المواد الاولية",
+    "project": {
+      "id": 3,
+      "name": "ساحة الحياة",
+      "avatar": "/imgs/projects/project3-1.jpg"
+    }
+  },
+  {
+    "id": 5,
+    "documentUrl": "/docs/doc-s-5.docx",
+    "fromDate": "2023-04-14T21:00:00.000Z",
+    "toDate": "2023-04-30T21:00:00.000Z",
+    "description": "تغير سعر الصرف",
+    "project": {
+      "id": 3,
+      "name": "ساحة الحياة",
+      "avatar": "/imgs/projects/project3-1.jpg"
+    }
+  },
+  {
+    "id": 6,
+    "documentUrl": null,
+    "fromDate": "2023-05-14T21:00:00.000Z",
+    "toDate": "2023-07-11T21:00:00.000Z",
+    "description": "توقف قانوني",
+    "project": {
+      "id": 3,
+      "name": "ساحة الحياة",
+      "avatar": "/imgs/projects/project3-1.jpg"
+    }
+  },
+  {
+    "id": 7,
+    "documentUrl": "/docs/doc-s-6.docx",
+    "fromDate": "2023-03-22T22:00:00.000Z",
+    "toDate": "2023-06-05T21:00:00.000Z",
+    "description": "صعوبة توفر المحروقات لنقل المواد",
+    "project": {
+      "id": 5,
+      "name": "مدرسة التفوق للمتميزين",
+      "avatar": "/imgs/projects/project5-1.jpg"
+    }
+  },
+  {
+    "id": 8,
+    "documentUrl": "/docs/doc_1674554784746.pdf",
+    "fromDate": "2019-12-14T22:00:00.000Z",
+    "toDate": "2019-12-29T22:00:00.000Z",
+    "description": "any desc",
+    "project": {
+      "id": 4,
+      "name": "مشفى الامل",
+      "avatar": "/imgs/projects/project4-1.jpg"
+    }
+  },
+  {
+    "id": 9,
+    "documentUrl": "/docs/zzz.pdf",
+    "fromDate": "2022-01-07T22:00:00.000Z",
+    "toDate": "2022-01-09T22:00:00.000Z",
+    "description": "zaher doc",
+    "project": {
+      "id": 3,
+      "name": "ساحة الحياة",
+      "avatar": "/imgs/projects/project3-1.jpg"
+    }
+  }
+]
+```
+
+to api for delete suspend:
+```bash
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/suspends/7
+```
+
+```json
+{
+  "success": true,
+  "message": "suspend has been delete"
+}
+```
+
+if there is no privelege to delete medis:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the suspend is not exists, or user cann't delete suspend (not project owner):
+```json
+{
+  "success": false,
+  "message": "suspend 7 not found or user: zaher is cann't delete the suspend"
+}
+```
+
+## Extensions
+the extension is record contain file and extendion duration period (in hours, days, month...) for the project, the extension file should upload to the server first and use the result path to store it,
+to upload extension file to the server, we should use this api endpoint: http://<DOMAIN>:4000/project-docs
+and the app should send the authorization key by header, as the same as sending any other request, the key is (doc) instead of (avatar)
+the request type is post, and content type is (multipart/formdata) and the response contain basic informations about uploaded image.
+```json
+{
+  "fieldname":"doc",
+  "originalname":"project-1.pdf",
+  "encoding":"7bit",
+  "mimetype":"applicatoin/pdf",
+  "destination":"dist/uploads/docs/project-1.pdf",
+  "filename":"doc_1674554784746.pdf",
+  "path":"/docs/doc_1674554784746.pdf",
+  "size":13889
+}
+```
+just json the result path with the domain name and port to retrive the image, the supported extensions and type of uploaded document are:
+doc, docx, txt, xls, xlsx, pdf, and maximum size is 5MB, if the other extensions of file type was uploaded or bigger size than 5MB, the server return an error.
+
+after uploading the image, we should use this api to save the project extension:
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$mt -d '{"projectId": 2, "byDuration": 350 ,"documentUrl": "/docs/doc_1674554784746.pdf", "description": "any desc"}' http://$url:4000/api/extensions
+```
+
+if the operation success, the server replay this response:
+```json
+{
+  "success": true,
+  "message": "extension has been created"
+}
+```
+
+if the user's role is VIEWER, so ther server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the user's role is PROJECT_MANAGER, but he's not the owener of projectId, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: zaher is under role <PROJECT_MANAGER> and cann't perform operation"
+}
+```
+
+if the user dosn't provide one of byDuration or project idin the requested data, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "projectId, byDuration are required for this operation"
+}
+```
+
+to read all extension that user able to view, we can use this api:
+```bash
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/extensions
+```
+
+the result example is:
+```json
+[
+  {
+    "id": 1,
+    "documentUrl": "/docs/doc1.docx",
+    "byDuration": 30,
+    "description": "تمديد اولي",
+    "project": {
+      "id": 1,
+      "name": "نقابة المهندسين",
+      "avatar": "/imgs/projects/project1-1.jpg"
+    }
+  },
+  {
+    "id": 2,
+    "documentUrl": "/docs/doc2.docx",
+    "byDuration": 22,
+    "description": "تمديد غير مشروع",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 3,
+    "documentUrl": "/docs/doc3.docx",
+    "byDuration": 17,
+    "description": "تمديد بسبب الاحوال الجوية",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 4,
+    "documentUrl": "/docs/doc_1674554784746.pdf",
+    "byDuration": 350,
+    "description": "any desc",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  }
+]
+```
+
+to api for delete extension:
+```bash
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/extensions/7
+```
+
+```json
+{
+  "success": true,
+  "message": "extension has been delete"
+}
+```
+
+if there is no privelege to delete medis:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the extension is not exists, or user cann't delete extension (not project owner):
+```json
+{
+  "success": false,
+  "message": "extension 7 not found or user: zaher is cann't delete the extension"
+}
+```
+
+
+
+## Payments
+the payment is record contain money amount and date for the project, to create new payment, we should use this api:
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$mt -d '{"projectId": 2, "amount": 600000 ,"paidAt": "12/30/2022", "description": "any desc"}' http://$url:4000/api/payments
+```
+
+if the operation success, the server replay this response:
+```json
+{
+  "success": true,
+  "message": "payment has been created"
+}
+```
+
+if the user's role is VIEWER, so ther server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the user's role is PROJECT_MANAGER, but he's not the owener of projectId, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: zaher is under role <PROJECT_MANAGER> and cann't perform operation"
+}
+```
+
+if the user dosn't provide one of byDuration or project idin the requested data, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "projectId, byDuration are required for this operation"
+}
+```
+
+to read all payment that user able to view, we can use this api:
+```bash
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/payments
+```
+
+the result example is:
+```json
+[
+  {
+    "id": 5,
+    "amount": "900000",
+    "paidAt": "2023-02-01T07:46:44.732Z",
+    "description": "دفعة اولية",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 6,
+    "amount": "1200000",
+    "paidAt": "2023-02-01T07:46:44.732Z",
+    "description": "دفعة اضافية",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 7,
+    "amount": "1000000",
+    "paidAt": "2023-02-01T07:46:44.732Z",
+    "description": "دفعة مع شراء مواد",
+    "project": {
+      "id": 2,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 11,
+    "amount": "1000000",
+    "paidAt": "2023-02-01T07:46:44.761Z",
+    "description": "افتتاح المشروع",
+    "project": {
+      "id": 4,
+      "name": "مشفى الامل",
+      "avatar": "/imgs/projects/project4-1.jpg"
+    }
+  },
+  {
+    "id": 12,
+    "amount": "3000000",
+    "paidAt": "2023-02-01T07:46:44.761Z",
+    "description": "بناء الجوائز",
+    "project": {
+      "id": 4,
+      "name": "مشفى الامل",
+      "avatar": "/imgs/projects/project4-1.jpg"
+    }
+  },
+  {
+    "id": 13,
+    "amount": "4000000",
+    "paidAt": "2023-02-01T07:46:44.761Z",
+    "description": "",
+    "project": {
+      "id": 4,
+      "name": "مشفى الامل",
+      "avatar": "/imgs/projects/project4-1.jpg"
+    }
+  }
+]
+```
+
+to api for delete payment:
+```bash
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/payments/7
+```
+
+```json
+{
+  "success": true,
+  "message": "payment has been delete"
+}
+```
+
+if there is no privelege to delete medis:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the payment is not exists, or user cann't delete payment (not project owner):
+```json
+{
+  "success": false,
+  "message": "payment 7 not found or user: zaher is cann't delete the payment"
+}
+```

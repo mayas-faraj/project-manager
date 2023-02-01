@@ -55,6 +55,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         },
                         media: {
                             select: {
+                                id: true,
                                 src: true,
                                 title: true,
                                 orderIndex: true
@@ -65,6 +66,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         },
                         extensions: {
                             select: {
+                                id: true,
                                 byDuration: true,
                                 description: true,
                                 documentUrl: true
@@ -72,6 +74,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         },
                         payments: {
                             select: {
+                                id: true,
                                 amount: true,
                                 description: true,
                                 paidAt: true
@@ -79,6 +82,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         },
                         suspends: {
                             select: {
+                                id: true,
                                 description: true,
                                 documentUrl: true,
                                 fromDate: true,
@@ -156,7 +160,8 @@ class ProjectController extends controllerBase_1.ControllerBase {
                             select: {
                                 id: true,
                                 src: true,
-                                title: true
+                                title: true,
+                                orderIndex: true
                             },
                             orderBy: {
                                 orderIndex: 'asc'

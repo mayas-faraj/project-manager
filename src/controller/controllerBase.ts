@@ -29,6 +29,13 @@ export abstract class ControllerBase {
     }
   }
 
+  protected unsupportedResult (): OperationResult {
+    return {
+      success: false,
+      message: 'unsupported operation'
+    }
+  }
+
   protected requiredResult (object: any, ...fields: string[]): OperationResult | false {
     // precondition: none
 

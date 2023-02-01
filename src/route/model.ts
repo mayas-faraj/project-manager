@@ -1,13 +1,22 @@
 import { Router, Request, Response } from 'express'
 import UserController from '../controller/userController'
 import ProjectController from '../controller/projectController'
+import MediaController from '../controller/mediaController'
+import SuspendController from '../controller/suspendController'
+import ExtensionController from '../controller/extensionController'
+import PaymentController from '../controller/paymentController'
+
 // define router
 const router: Router = Router()
 
 // available models
 const models = [
   { route: 'users', controller: new UserController() },
-  { route: 'projects', controller: new ProjectController() }
+  { route: 'projects', controller: new ProjectController() },
+  { route: 'media', controller: new MediaController() },
+  { route: 'suspends', controller: new SuspendController() },
+  { route: 'extensions', controller: new ExtensionController() },
+  { route: 'payments', controller: new PaymentController() }
 ]
 
 // generic routes
