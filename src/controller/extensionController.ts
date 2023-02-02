@@ -55,7 +55,7 @@ export default class ExtensionController extends ControllerBase {
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
     // precondition
-    const missingFields = this.requiredResult(data, 'byDuration')
+    const missingFields = this.requiredResult(data, 'projectId', 'byDuration')
     if (missingFields !== false) return missingFields
 
     // checking privelege

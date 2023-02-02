@@ -5,6 +5,7 @@ import MediaController from '../controller/mediaController'
 import SuspendController from '../controller/suspendController'
 import ExtensionController from '../controller/extensionController'
 import PaymentController from '../controller/paymentController'
+import CommentController from '../controller/commentController'
 
 // define router
 const router: Router = Router()
@@ -16,7 +17,8 @@ const models = [
   { route: 'media', controller: new MediaController() },
   { route: 'suspends', controller: new SuspendController() },
   { route: 'extensions', controller: new ExtensionController() },
-  { route: 'payments', controller: new PaymentController() }
+  { route: 'payments', controller: new PaymentController() },
+  { route: 'comments', controller: new CommentController() }
 ]
 
 // generic routes

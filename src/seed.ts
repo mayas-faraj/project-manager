@@ -102,6 +102,27 @@ async function main (): Promise<void> {
             }
           ]
         }
+      },
+      comments: {
+        createMany: {
+          data: [
+            {
+              text: 'زيارة لجان التدقيق الاسبوع القادم',
+              createdAt: new Date(2023, 1, 3),
+              creatorId: 1
+            },
+            {
+              text: 'تأجيل موعد زيارة لجان التدقيق',
+              createdAt: new Date(2023, 1, 6),
+              creatorId: 1
+            },
+            {
+              text: 'تم انضمام 7 عمال جدد للقيام باعمال بناء الاسطح',
+              createdAt: new Date(2023, 2, 5),
+              creatorId: 1
+            }
+          ]
+        }
       }
     }
   })
@@ -235,6 +256,17 @@ async function main (): Promise<void> {
             }
           ]
         }
+      },
+      comments: {
+        createMany: {
+          data: [
+            {
+              text: 'اجتماع مع نقابة المهندسين واجراء عدد من الاقتراحات',
+              createdAt: new Date(2023, 1, 23),
+              creatorId: 1
+            }
+          ]
+        }
       }
     }
   })
@@ -270,7 +302,23 @@ async function main (): Promise<void> {
           data: [
             { amount: 1000000, description: 'افتتاح المشروع', creatorId: 2 },
             { amount: 3000000, description: 'بناء الجوائز', creatorId: 2 },
-            { amount: 4000000, description: '', creatorId: 2 }
+            { amount: 4000000, description: 'نقل مواد', creatorId: 2 }
+          ]
+        }
+      },
+      comments: {
+        createMany: {
+          data: [
+            {
+              text: 'الجوائز تم انشائها بتسليح مضاعف',
+              createdAt: new Date(2023, 2, 11),
+              creatorId: 1
+            },
+            {
+              text: 'مناقشة وضع اسقف مستعارة',
+              createdAt: new Date(2023, 2, 21),
+              creatorId: 1
+            }
           ]
         }
       }
@@ -312,6 +360,27 @@ async function main (): Promise<void> {
               toDate: new Date(2023, 5, 6),
               description: 'صعوبة توفر المحروقات لنقل المواد',
               documentUrl: '/docs/doc-s-6.docx',
+              creatorId: 1
+            }
+          ]
+        }
+      },
+      comments: {
+        createMany: {
+          data: [
+            {
+              text: 'التدقيق بشان المواد',
+              createdAt: new Date(2023, 2, 23),
+              creatorId: 1
+            },
+            {
+              text: 'تم تدقيق المواد مع المشرف',
+              createdAt: new Date(2023, 2, 29),
+              creatorId: 1
+            },
+            {
+              text: 'الاسبوع القادم زيادة لجنة الكشف',
+              createdAt: new Date(2023, 3, 5),
               creatorId: 1
             }
           ]

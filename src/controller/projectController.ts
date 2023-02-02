@@ -83,6 +83,13 @@ export default class ProjectController extends ControllerBase {
               fromDate: true,
               toDate: true
             }
+          },
+          comments: {
+            select: {
+              id: true,
+              text: true,
+              createdAt: true
+            }
           }
         }
 
@@ -173,6 +180,13 @@ export default class ProjectController extends ControllerBase {
               id: true,
               name: true,
               avatar: true
+            }
+          },
+          comments: {
+            select: {
+              id: true,
+              text: true,
+              createdAt: true
             }
           }
         }

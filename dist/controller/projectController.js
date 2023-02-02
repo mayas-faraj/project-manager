@@ -88,6 +88,13 @@ class ProjectController extends controllerBase_1.ControllerBase {
                                 fromDate: true,
                                 toDate: true
                             }
+                        },
+                        comments: {
+                            select: {
+                                id: true,
+                                text: true,
+                                createdAt: true
+                            }
                         }
                     }
                 });
@@ -172,6 +179,13 @@ class ProjectController extends controllerBase_1.ControllerBase {
                                 id: true,
                                 name: true,
                                 avatar: true
+                            }
+                        },
+                        comments: {
+                            select: {
+                                id: true,
+                                text: true,
+                                createdAt: true
                             }
                         }
                     }

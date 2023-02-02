@@ -1,8 +1,8 @@
-import { Payment } from '@prisma/client'
+import { Comment } from '@prisma/client'
 import { Model, UserInfo, OperationResult } from '../types'
 import { ControllerBase } from './controllerBase'
 
-export default class PaymentController extends ControllerBase {
+export default class CommentController extends ControllerBase {
   public constructor () {
     super()
   }
@@ -20,17 +20,16 @@ export default class PaymentController extends ControllerBase {
     }
 
     // critical operation
-    let result: Array<Partial<Payment>>
+    let result: Array<Partial<Comment>>
     try {
-      result = await this.prismaClient.payment.findMany({
+      result = await this.prismaClient.comment.findMany({
         take,
         skip,
         where: condition,
         select: {
           id: true,
-          amount: true,
-          paidAt: true,
-          description: true,
+          text: true,
+          createdAt: true,
           project: {
             select: {
               id: true,
@@ -55,19 +54,18 @@ export default class PaymentController extends ControllerBase {
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
     // precondition
-    const missingFields = this.requiredResult(data, 'projectId', 'amount', 'paidAt')
+    const missingFields = this.requiredResult(data, 'projectId', 'text')
     if (missingFields !== false) return missingFields
 
     // checking privelege
     if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
-    const paymentData = data as Payment
-    paymentData.paidAt = new Date(paymentData.paidAt)
+    const commentData = data as Comment
     if (userInfo.rol === 'PROJECT_MANAGER') {
       try {
         const result = await this.prismaClient.project.findUnique({
           where: {
-            id: paymentData.projectId
+            id: commentData.projectId
           },
           select: {
             creatorId: true
@@ -81,11 +79,11 @@ export default class PaymentController extends ControllerBase {
     }
 
     // critical operation
-    paymentData.creatorId = userInfo.id
+    commentData.creatorId = userInfo.id
     let result
     try {
-      result = await this.prismaClient.payment.create({
-        data: data as Payment
+      result = await this.prismaClient.comment.create({
+        data: data as Comment
       })
     } catch (ex: any) {
       return this.errorResult(ex)
@@ -95,7 +93,7 @@ export default class PaymentController extends ControllerBase {
     if (result !== undefined) {
       return {
         success: true,
-        message: 'payment has been created'
+        message: 'comment has been created'
       }
     } else {
       return {
@@ -131,7 +129,7 @@ export default class PaymentController extends ControllerBase {
     // critical operatoin
     let result
     try {
-      result = await this.prismaClient.payment.deleteMany({
+      result = await this.prismaClient.comment.deleteMany({
         where: {
           AND: condition
         }
@@ -144,12 +142,12 @@ export default class PaymentController extends ControllerBase {
     if (result.count > 0) {
       return {
         success: true,
-        message: 'payment has been delete'
+        message: 'comment has been delete'
       }
     } else {
       return {
         success: false,
-        message: `payment ${id} not found or user: ${userInfo.nam} is cann't delete the payment`
+        message: `comment ${id} not found or user: ${userInfo.nam} is cann't delete the comment`
       }
     }
   }

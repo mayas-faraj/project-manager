@@ -11,19 +11,20 @@ datasource db {
 }
 
 model User {
-  id                Int             @id @default(autoincrement())
-  name              String          @db.VarChar(50)
-  password          String          @db.VarChar(150)
-  avatar            String?         @db.VarChar(250)
-  lastLoginAt       DateTime?       @map("last_login_at")
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedAt          DateTime        @map("updated_at") @updatedAt
-  role              Role            @default(VIEWER)
+  id                Int         @id @default(autoincrement())
+  name              String      @db.VarChar(50)
+  password          String      @db.VarChar(150)
+  avatar            String?     @db.VarChar(250)
+  lastLoginAt       DateTime?   @map("last_login_at")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+  role              Role        @default(VIEWER)
   createdProjects   Project[]
   createdPayments   Payment[]
   createdSuspends   Suspend[]
   createdExtensions Extension[]
   createdMedia      Media[]
+  createdComments   Comment[]
   setting           Setting[]
 
   @@unique([name])
@@ -31,28 +32,29 @@ model User {
 }
 
 model Project {
-  id                 Int             @id @default(autoincrement())
-  name               String          @db.VarChar(50)
-  remark             String?         @db.LongText
+  id                 Int         @id @default(autoincrement())
+  name               String      @db.VarChar(50)
+  remark             String?     @db.LongText
   longitude          Float?
   latitude           Float?
-  companyName        String?         @db.VarChar(50)
-  engineerName       String?         @map("engineer_name") @db.VarChar(50)
-  engineerPhone      String?         @map("engineer_phone") @db.VarChar(50)
-  engineerDepartment String?         @map("engineer_department") @db.VarChar(100)
-  avatar             String?         @db.VarChar(500)
-  duration           Int             @default(0)
-  cost               Decimal         @default(0)
-  amountPaid         Decimal         @default(0) @map("amount_paid")
-  status             Status          @default(WORKING)
-  creatorId          Int             @map("user_id")
-  creator            User            @relation(fields: [creatorId], references: [id])
-  createdAt          DateTime        @default(now()) @map("created_at")
-  updatedAt          DateTime        @map("updated_at") @updatedAt
+  companyName        String?     @db.VarChar(50)
+  engineerName       String?     @map("engineer_name") @db.VarChar(50)
+  engineerPhone      String?     @map("engineer_phone") @db.VarChar(50)
+  engineerDepartment String?     @map("engineer_department") @db.VarChar(100)
+  avatar             String?     @db.VarChar(500)
+  duration           Int         @default(0)
+  cost               Decimal     @default(0)
+  amountPaid         Decimal     @default(0) @map("amount_paid")
+  status             Status      @default(WORKING)
+  creatorId          Int         @map("user_id")
+  creator            User        @relation(fields: [creatorId], references: [id])
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
   media              Media[]
   payments           Payment[]
   suspends           Suspend[]
   extensions         Extension[]
+  comments           Comment[]
 
   @@unique([name])
   @@map("project")
@@ -61,7 +63,7 @@ model Project {
 model Media {
   id         Int      @id @default(autoincrement())
   src        String   @db.VarChar(500)
-  title      String?   @db.VarChar(100) 
+  title      String?  @db.VarChar(100)
   orderIndex Int      @default(0)
   createdAt  DateTime @default(now()) @map("created_at")
   projectId  Int      @map("project_id")
@@ -76,7 +78,7 @@ model Payment {
   id          Int      @id @default(autoincrement())
   amount      Decimal  @default(0)
   paidAt      DateTime @default(now()) @map("paid_at")
-  description String?  @db.VarChar(500)
+  description String   @db.VarChar(500)
   projectId   Int      @map("project_id")
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   creatorId   Int      @map("user_id")
@@ -89,7 +91,7 @@ model Suspend {
   id          Int      @id @default(autoincrement())
   fromDate    DateTime @default(now()) @map("from_date")
   toDate      DateTime @map("to_date")
-  description String?  @db.VarChar(500)
+  description String   @db.VarChar(500)
   documentUrl String?
   projectId   Int      @map("project_id")
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -102,14 +104,26 @@ model Suspend {
 model Extension {
   id          Int     @id @default(autoincrement())
   byDuration  Int     @default(0)
-  description String? @db.VarChar(500)
+  description String  @db.VarChar(500)
   documentUrl String?
   projectId   Int     @map("project_id")
   project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   creatorId   Int     @map("user_id")
   creator     User    @relation(fields: [creatorId], references: [id])
 
-  @@map("extensions")
+  @@map("extension")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  projectId Int      @map("project_id")
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creatorId Int      @map("user_id")
+  creator   User     @relation(fields: [creatorId], references: [id])
+
+  @@map("comment")
 }
 
 model Setting {

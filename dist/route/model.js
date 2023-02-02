@@ -19,6 +19,7 @@ const mediaController_1 = __importDefault(require("../controller/mediaController
 const suspendController_1 = __importDefault(require("../controller/suspendController"));
 const extensionController_1 = __importDefault(require("../controller/extensionController"));
 const paymentController_1 = __importDefault(require("../controller/paymentController"));
+const commentController_1 = __importDefault(require("../controller/commentController"));
 // define router
 const router = (0, express_1.Router)();
 // available models
@@ -28,7 +29,8 @@ const models = [
     { route: 'media', controller: new mediaController_1.default() },
     { route: 'suspends', controller: new suspendController_1.default() },
     { route: 'extensions', controller: new extensionController_1.default() },
-    { route: 'payments', controller: new paymentController_1.default() }
+    { route: 'payments', controller: new paymentController_1.default() },
+    { route: 'comments', controller: new commentController_1.default() }
 ];
 // generic routes
 models.forEach(model => {

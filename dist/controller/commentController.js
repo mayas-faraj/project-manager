@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const controllerBase_1 = require("./controllerBase");
-class PaymentController extends controllerBase_1.ControllerBase {
+class CommentController extends controllerBase_1.ControllerBase {
     constructor() {
         super();
     }
@@ -27,15 +27,14 @@ class PaymentController extends controllerBase_1.ControllerBase {
             // critical operation
             let result;
             try {
-                result = yield this.prismaClient.payment.findMany({
+                result = yield this.prismaClient.comment.findMany({
                     take,
                     skip,
                     where: condition,
                     select: {
                         id: true,
-                        amount: true,
-                        paidAt: true,
-                        description: true,
+                        text: true,
+                        createdAt: true,
                         project: {
                             select: {
                                 id: true,
@@ -61,19 +60,18 @@ class PaymentController extends controllerBase_1.ControllerBase {
     create(userInfo, data) {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition
-            const missingFields = this.requiredResult(data, 'projectId', 'amount', 'paidAt');
+            const missingFields = this.requiredResult(data, 'projectId', 'text');
             if (missingFields !== false)
                 return missingFields;
             // checking privelege
             if (userInfo.rol === 'VIEWER')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
-            const paymentData = data;
-            paymentData.paidAt = new Date(paymentData.paidAt);
+            const commentData = data;
             if (userInfo.rol === 'PROJECT_MANAGER') {
                 try {
                     const result = yield this.prismaClient.project.findUnique({
                         where: {
-                            id: paymentData.projectId
+                            id: commentData.projectId
                         },
                         select: {
                             creatorId: true
@@ -87,10 +85,10 @@ class PaymentController extends controllerBase_1.ControllerBase {
                 }
             }
             // critical operation
-            paymentData.creatorId = userInfo.id;
+            commentData.creatorId = userInfo.id;
             let result;
             try {
-                result = yield this.prismaClient.payment.create({
+                result = yield this.prismaClient.comment.create({
                     data: data
                 });
             }
@@ -101,7 +99,7 @@ class PaymentController extends controllerBase_1.ControllerBase {
             if (result !== undefined) {
                 return {
                     success: true,
-                    message: 'payment has been created'
+                    message: 'comment has been created'
                 };
             }
             else {
@@ -134,7 +132,7 @@ class PaymentController extends controllerBase_1.ControllerBase {
             // critical operatoin
             let result;
             try {
-                result = yield this.prismaClient.payment.deleteMany({
+                result = yield this.prismaClient.comment.deleteMany({
                     where: {
                         AND: condition
                     }
@@ -147,16 +145,16 @@ class PaymentController extends controllerBase_1.ControllerBase {
             if (result.count > 0) {
                 return {
                     success: true,
-                    message: 'payment has been delete'
+                    message: 'comment has been delete'
                 };
             }
             else {
                 return {
                     success: false,
-                    message: `payment ${id} not found or user: ${userInfo.nam} is cann't delete the payment`
+                    message: `comment ${id} not found or user: ${userInfo.nam} is cann't delete the comment`
                 };
             }
         });
     }
 }
-exports.default = PaymentController;
+exports.default = CommentController;

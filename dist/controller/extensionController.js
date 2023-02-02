@@ -61,7 +61,7 @@ class ExtensionController extends controllerBase_1.ControllerBase {
     create(userInfo, data) {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition
-            const missingFields = this.requiredResult(data, 'byDuration');
+            const missingFields = this.requiredResult(data, 'projectId', 'byDuration');
             if (missingFields !== false)
                 return missingFields;
             // checking privelege

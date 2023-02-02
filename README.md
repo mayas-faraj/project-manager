@@ -400,7 +400,7 @@ if the user dosn't provide (src) in the requested data, the server replay this r
 
 to read all media that user able to view, we can use this api:
 ```bash
-curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/media
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>'  http://<URL>:4000/api/media
 ```
 
 the result example is:
@@ -477,7 +477,7 @@ the result example is:
 
 to api for delete media:
 ```bash
-curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/media/7
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' http://<URL>:4000/api/media/7
 ```
 
 ```json
@@ -525,7 +525,7 @@ doc, docx, txt, xls, xlsx, pdf, and maximum size is 5MB, if the other extensions
 
 after uploading the image, we should use this api to save the project suspend:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$mt -d '{"projectId": 4, "fromDate": "12/10/2019", "toDate": "12/25/2019" ,"documentUrl": "/docs/doc_1674554784746.pdf", "description": "any desc"}' http://$url:4000/api/suspends
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"projectId": 4, "fromDate": "12/10/2019", "toDate": "12/25/2019" ,"documentUrl": "/docs/doc_1674554784746.pdf", "description": "any desc"}' http://<URL>:4000/api/suspends
 ```
 the date format is US-date format: MM/dd/YYYY.
 
@@ -563,7 +563,7 @@ if the user dosn't provide one of (projectId, fromDate, toDate) in the requested
 
 to read all suspend that user able to view, we can use this api:
 ```bash
-curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/suspends
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>'  http://<URL>:4000/api/suspends
 ```
 
 the result example is:
@@ -682,7 +682,7 @@ the result example is:
 
 to api for delete suspend:
 ```bash
-curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/suspends/7
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' http://<URL>:4000/api/suspends/7
 ```
 
 ```json
@@ -730,7 +730,7 @@ doc, docx, txt, xls, xlsx, pdf, and maximum size is 5MB, if the other extensions
 
 after uploading the image, we should use this api to save the project extension:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$mt -d '{"projectId": 2, "byDuration": 350 ,"documentUrl": "/docs/doc_1674554784746.pdf", "description": "any desc"}' http://$url:4000/api/extensions
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"projectId": 2, "byDuration": 350 ,"documentUrl": "/docs/doc_1674554784746.pdf", "description": "any desc"}' http://<URL>:4000/api/extensions
 ```
 
 if the operation success, the server replay this response:
@@ -767,7 +767,7 @@ if the user dosn't provide one of byDuration or project idin the requested data,
 
 to read all extension that user able to view, we can use this api:
 ```bash
-curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/extensions
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>'  http://<URL>:4000/api/extensions
 ```
 
 the result example is:
@@ -822,7 +822,7 @@ the result example is:
 
 to api for delete extension:
 ```bash
-curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/extensions/7
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' http://<URL>:4000/api/extensions/7
 ```
 
 ```json
@@ -853,7 +853,7 @@ if the extension is not exists, or user cann't delete extension (not project own
 ## Payments
 the payment is record contain money amount and date for the project, to create new payment, we should use this api:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer '$mt -d '{"projectId": 2, "amount": 600000 ,"paidAt": "12/30/2022", "description": "any desc"}' http://$url:4000/api/payments
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"projectId": 2, "amount": 600000 ,"paidAt": "12/30/2022", "description": "any desc"}' http://<URL>:4000/api/payments
 ```
 
 if the operation success, the server replay this response:
@@ -890,7 +890,7 @@ if the user dosn't provide one of byDuration or project idin the requested data,
 
 to read all payment that user able to view, we can use this api:
 ```bash
-curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer '$zt  http://$url:4000/api/payments
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>'  http://<URL>:4000/api/payments
 ```
 
 the result example is:
@@ -967,7 +967,7 @@ the result example is:
 
 to api for delete payment:
 ```bash
-curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer '$at http://$url:4000/api/payments/7
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' http://<URL>:4000/api/payments/7
 ```
 
 ```json
@@ -990,5 +990,104 @@ if the payment is not exists, or user cann't delete payment (not project owner):
 {
   "success": false,
   "message": "payment 7 not found or user: zaher is cann't delete the payment"
+}
+```
+
+
+## Comments
+the comment is text combie with  date for the project, to create new comment, we should use this api:
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"projectId": 11, "text": "any test for the comment"}' http://<URL>:4000/api/comments
+```
+
+if the operation success, the server replay this response:
+```json
+{
+  "success": true,
+  "message": "comment has been created"
+}
+```
+
+if the user's role is VIEWER, so ther server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the user's role is PROJECT_MANAGER, but he's not the owener of projectId, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "user: zaher is under role <PROJECT_MANAGER> and cann't perform operation"
+}
+```
+
+if the user dosn't provide one of byDuration or project idin the requested data, the server replay this response:
+```json
+{
+  "success": false,
+  "message": "projectId, byDuration are required for this operation"
+}
+```
+
+to read all comment that user able to view, we can use this api:
+```bash
+curl -X GET -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>'  http://<URL>:4000/api/comments
+```
+
+the result example is:
+```json
+[
+  {
+    "id": 10,
+    "text": "any text",
+    "createdAt": "2023-02-02T14:20:46.958Z",
+    "project": {
+      "id": 12,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  },
+  {
+    "id": 11,
+    "text": "other text",
+    "createdAt": "2023-01-02T11:25:49.307Z",
+    "project": {
+      "id": 12,
+      "name": "ملعب الاتحاد",
+      "avatar": "/imgs/projects/project2-1.jpg"
+    }
+  }
+]
+
+```
+
+to api for delete comment:
+```bash
+curl -X DELETE -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' http://<URL>:4000/api/comments/7
+```
+
+```json
+{
+  "success": true,
+  "message": "comment has been delete"
+}
+```
+
+if there is no privelege to delete medis:
+```json
+{
+  "success": false,
+  "message": "user: mayas is under role <VIEWER> and cann't perform operation"
+}
+```
+
+if the comment is not exists, or user cann't delete comment (not project owner):
+```json
+{
+  "success": false,
+  "message": "comment 7 not found or user: zaher is cann't delete the comment"
 }
 ```
