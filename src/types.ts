@@ -1,4 +1,5 @@
 import { User, Project, Media, Suspend, Payment, Extension, Comment } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime'
 
 // declare interface
 declare global {
@@ -10,10 +11,18 @@ declare global {
   }
 }
 
+// exporting data types
+export type Status = 'WORKING' | 'STOPPED' | 'COMPLETED' | 'LATE'
+
+export interface FullProject extends Project {
+  amountPaid: Decimal
+  status?: Status
+}
+
 export interface UserInfo {
   id: number
   nam: string
-  rol: 'ADMIN' | 'PROJECT_MANAGER' | 'VIEWER'
+  rol: 'ADMIN' | 'PROJECT_MANAGER' | 'VIEWER' | 'GOVERNOR'
 }
 
 export interface OperationResult {
@@ -21,4 +30,4 @@ export interface OperationResult {
   message: string
 }
 
-export type Model = User | Project | Media | Suspend | Payment | Extension | Comment
+export type Model = User | FullProject | Media | Suspend | Payment | Extension | Comment

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const runtime_1 = require("@prisma/client/runtime");
 const controllerBase_1 = require("./controllerBase");
 class ProjectController extends controllerBase_1.ControllerBase {
     constructor() {
@@ -36,8 +37,6 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         name: true,
                         remark: true,
                         avatar: true,
-                        status: true,
-                        amountPaid: true,
                         companyName: true,
                         engineerName: true,
                         engineerPhone: true,
@@ -46,7 +45,9 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         duration: true,
                         longitude: true,
                         latitude: true,
+                        isCompleted: true,
                         createdAt: true,
+                        updatedAt: true,
                         creator: {
                             select: {
                                 name: true,
@@ -102,7 +103,15 @@ class ProjectController extends controllerBase_1.ControllerBase {
             catch (ex) {
                 return this.errorResult(ex);
             }
-            return result;
+            return result.map(item => {
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                const extensionsDuration = item.extensions.reduce((acc, obj) => acc + obj.byDuration, 0);
+                return Object.assign(Object.assign({}, item), { amountPaid: item.payments.reduce((acc, obj) => acc.add(obj.amount), new runtime_1.Decimal(0)), 
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    duration: item.duration + extensionsDuration, 
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    status: item.isCompleted === 1 ? 'COMPLETED' : this.getStatus(item.createdAt, item.duration + extensionsDuration, item.suspends.map(suspend => ({ from: suspend.fromDate, to: suspend.toDate }))) });
+            });
         });
     }
     find(userInfo, id) {
@@ -136,8 +145,8 @@ class ProjectController extends controllerBase_1.ControllerBase {
                         avatar: true,
                         duration: true,
                         cost: true,
-                        amountPaid: true,
-                        status: true,
+                        isCompleted: true,
+                        createdAt: true,
                         suspends: {
                             select: {
                                 id: true,
@@ -194,21 +203,32 @@ class ProjectController extends controllerBase_1.ControllerBase {
             catch (ex) {
                 return this.errorResult(ex);
             }
+            if (result != null) {
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                const extensionsDuration = result.extensions.reduce((acc, obj) => acc + obj.byDuration, 0);
+                return Object.assign(Object.assign({}, result), { amountPaid: result.payments.reduce((acc, obj) => acc.add(obj.amount), new runtime_1.Decimal(0)), 
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    duration: result.duration + extensionsDuration, 
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    status: result.isCompleted === 1 ? 'COMPLETED' : this.getStatus(result.createdAt, result.duration + extensionsDuration, result.suspends.map(suspend => ({ from: suspend.fromDate, to: suspend.toDate }))) });
+            }
             return result;
         });
     }
     create(userInfo, data) {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition
-            const missingFields = this.requiredResult(data, 'name', 'cost', 'amountPaid', 'duration');
+            const missingFields = this.requiredResult(data, 'name', 'cost', 'duration');
             if (missingFields !== false)
                 return missingFields;
             // checking privelege
-            if (userInfo.rol === 'VIEWER')
+            if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             // critical operation
             const projectData = data;
             projectData.creatorId = userInfo.id;
+            if (projectData.createdAt != null)
+                projectData.createdAt = new Date(projectData.createdAt);
             let result;
             try {
                 result = yield this.prismaClient.project.create({
@@ -237,7 +257,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition: none
             // checking privelege
-            if (userInfo.rol === 'VIEWER')
+            if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             const condition = {
                 id,
@@ -247,6 +267,13 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 condition.creatorId = userInfo.id;
             }
             // critical operatoin
+            const projectData = data;
+            if (projectData.createdAt != null)
+                projectData.createdAt = new Date(projectData.createdAt);
+            if (projectData.status != null) {
+                projectData.isCompleted = (projectData.status === 'COMPLETED') ? 1 : 0;
+                delete projectData.status;
+            }
             let result;
             try {
                 result = yield this.prismaClient.project.updateMany({
@@ -278,7 +305,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition: none
             // checking privelege
-            if (userInfo.rol === 'VIEWER')
+            if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             const condition = {
                 id,
@@ -313,6 +340,18 @@ class ProjectController extends controllerBase_1.ControllerBase {
                 };
             }
         });
+    }
+    getStatus(createdDate, duration, suspends) {
+        const now = Date.now();
+        for (let i = 0; i < suspends.length; i++) {
+            if (suspends[i].from.getTime() <= now && suspends[i].to.getTime() > now) {
+                return 'STOPPED';
+            }
+        }
+        if (now < createdDate.getTime() + duration * (1000 * 60 * 60 * 24))
+            return 'WORKING';
+        else
+            return 'LATE';
     }
 }
 exports.default = ProjectController;

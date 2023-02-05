@@ -126,7 +126,7 @@ class CommentController extends controllerBase_1.ControllerBase {
                 id,
                 creatorId: undefined
             };
-            if (userInfo.rol === 'PROJECT_MANAGER') {
+            if (userInfo.rol === 'PROJECT_MANAGER' || userInfo.rol === 'GOVERNOR') {
                 condition.creatorId = userInfo.id;
             }
             // critical operatoin

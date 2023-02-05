@@ -65,7 +65,7 @@ class ExtensionController extends controllerBase_1.ControllerBase {
             if (missingFields !== false)
                 return missingFields;
             // checking privelege
-            if (userInfo.rol === 'VIEWER')
+            if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             const extensionData = data;
             if (userInfo.rol === 'PROJECT_MANAGER') {
@@ -121,7 +121,7 @@ class ExtensionController extends controllerBase_1.ControllerBase {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition: none
             // checking privelege
-            if (userInfo.rol === 'VIEWER')
+            if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             const condition = {
                 id,

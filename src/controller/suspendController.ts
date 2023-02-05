@@ -60,7 +60,7 @@ export default class SuspendController extends ControllerBase {
     if (missingFields !== false) return missingFields
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const suspendData = data as Suspend
     if (userInfo.rol === 'PROJECT_MANAGER') {
@@ -116,7 +116,7 @@ export default class SuspendController extends ControllerBase {
     // precondition: none
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const condition: {
       id: number

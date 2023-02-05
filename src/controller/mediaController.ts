@@ -60,7 +60,7 @@ export default class MediaController extends ControllerBase {
     if (missingFields !== false) return missingFields
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const mediaData = data as Media
     if (userInfo.rol === 'PROJECT_MANAGER') {
@@ -114,7 +114,7 @@ export default class MediaController extends ControllerBase {
     // precondition: none
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const condition: {
       id: number

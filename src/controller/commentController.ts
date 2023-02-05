@@ -122,7 +122,7 @@ export default class CommentController extends ControllerBase {
       creatorId: undefined
     }
 
-    if (userInfo.rol === 'PROJECT_MANAGER') {
+    if (userInfo.rol === 'PROJECT_MANAGER' || userInfo.rol === 'GOVERNOR') {
       condition.creatorId = userInfo.id
     }
 

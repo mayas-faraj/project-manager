@@ -5,6 +5,8 @@ async function main (): Promise<void> {
 
   await prisma.suspend.deleteMany({})
   await prisma.payment.deleteMany({})
+  await prisma.extension.deleteMany({})
+  await prisma.comment.deleteMany({})
   await prisma.media.deleteMany({})
   await prisma.project.deleteMany({})
   await prisma.user.deleteMany({})
@@ -31,6 +33,13 @@ async function main (): Promise<void> {
         password: '3505ac73417d654c0f22ede988f6e4fcb4108eecc35b2aafcd722fae9c121223bbdb6f728bdd913246dfa120df595183d811578a549458a2bbfdd8f5f405b556',
         avatar: '/imgs/users/mayas.png',
         role: 'VIEWER'
+      },
+      {
+        id: 4,
+        name: 'yazan',
+        password: '3505ac73417d654c0f22ede988f6e4fcb4108eecc35b2aafcd722fae9c121223bbdb6f728bdd913246dfa120df595183d811578a549458a2bbfdd8f5f405b556',
+        avatar: '/imgs/users/yazan.png',
+        role: 'GOVERNOR'
       }
     ]
   })
@@ -43,10 +52,9 @@ async function main (): Promise<void> {
       remark: 'مشروع اعادة نقابة المهنسين العراقيين',
       duration: 450,
       cost: 1600000000,
-      amountPaid: 400000000,
       longitude: 44.309062,
       latitude: 32.041784,
-      status: 'WORKING',
+      isCompleted: 0,
       avatar: '/imgs/projects/project1-1.jpg',
       companyName: 'الشركة المتحدة',
       creatorId: 1,
@@ -119,7 +127,7 @@ async function main (): Promise<void> {
             {
               text: 'تم انضمام 7 عمال جدد للقيام باعمال بناء الاسطح',
               createdAt: new Date(2023, 2, 5),
-              creatorId: 1
+              creatorId: 4
             }
           ]
         }
@@ -135,10 +143,9 @@ async function main (): Promise<void> {
       remark: 'ملعب كرة قدم',
       duration: 450,
       cost: 1100000000,
-      amountPaid: 340000000,
       longitude: 44.309162,
       latitude: 32.041284,
-      status: 'WORKING',
+      isCompleted: 0,
       creatorId: 2,
       avatar: '/imgs/projects/project2-1.jpg',
       companyName: 'شركة الأفق الدولية',
@@ -205,10 +212,9 @@ async function main (): Promise<void> {
       remark: 'ساحة وسط المحافظة مزودة بنوافير لضخ المياة وحديقة ازهار',
       duration: 250,
       cost: 200000000,
-      amountPaid: 100000000,
       longitude: 44.309062,
       latitude: 32.041784,
-      status: 'LATE',
+      isCompleted: 0,
       avatar: '/imgs/projects/project3-1.jpg',
       companyName: 'شركة جلجامش',
       creatorId: 2,
@@ -279,10 +285,9 @@ async function main (): Promise<void> {
       remark: 'مشفى عامل لعلاج جميع الامراض',
       duration: 180,
       cost: 1200000000,
-      amountPaid: 400000000,
       longitude: 44.302062,
       latitude: 32.041384,
-      status: 'WORKING',
+      isCompleted: 0,
       avatar: '/imgs/projects/project4-1.jpg',
       companyName: 'شركة تعمير العراق',
       creatorId: 1,
@@ -333,10 +338,9 @@ async function main (): Promise<void> {
       remark: 'مدرسة نموذجية للمتفوقين في الشهادة الاعدادية بكافة فروعها',
       duration: 400,
       cost: 1350000000,
-      amountPaid: 350000000,
       longitude: 44.309862,
       latitude: 32.041684,
-      status: 'WORKING',
+      isCompleted: 0,
       avatar: '/imgs/projects/project5-1.jpg',
       companyName: 'شركة اعمار',
       creatorId: 1,

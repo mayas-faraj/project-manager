@@ -1,5 +1,6 @@
 import { Project } from '@prisma/client'
-import { Model, UserInfo, OperationResult } from '../types'
+import { Decimal } from '@prisma/client/runtime'
+import { Model, UserInfo, OperationResult, Status, FullProject } from '../types'
 import { ControllerBase } from './controllerBase'
 
 export default class ProjectController extends ControllerBase {
@@ -20,7 +21,7 @@ export default class ProjectController extends ControllerBase {
     }
 
     // critical operation
-    let result: Array<Partial<Project>>
+    let result
     try {
       result = await this.prismaClient.project.findMany({
         take,
@@ -31,8 +32,6 @@ export default class ProjectController extends ControllerBase {
           name: true,
           remark: true,
           avatar: true,
-          status: true,
-          amountPaid: true,
           companyName: true,
           engineerName: true,
           engineerPhone: true,
@@ -41,7 +40,9 @@ export default class ProjectController extends ControllerBase {
           duration: true,
           longitude: true,
           latitude: true,
+          isCompleted: true,
           createdAt: true,
+          updatedAt: true,
           creator: {
             select: {
               name: true,
@@ -98,7 +99,18 @@ export default class ProjectController extends ControllerBase {
       return this.errorResult(ex)
     }
 
-    return result
+    return result.map(item => {
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      const extensionsDuration = item.extensions.reduce((acc, obj) => acc + obj.byDuration, 0)
+      return {
+        ...item,
+        amountPaid: item.payments.reduce((acc, obj) => acc.add(obj.amount), new Decimal(0)),
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        duration: item.duration + extensionsDuration,
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        status: item.isCompleted === 1 ? 'COMPLETED' : this.getStatus(item.createdAt, item.duration + extensionsDuration, item.suspends.map(suspend => ({ from: suspend.fromDate, to: suspend.toDate })))
+      }
+    })
   }
 
   public async find (userInfo: UserInfo, id: number): Promise<Partial<Model> | OperationResult | null> {
@@ -118,7 +130,7 @@ export default class ProjectController extends ControllerBase {
     }
 
     // critical operation
-    let result: Partial<Project> | null
+    let result
     try {
       result = await this.prismaClient.project.findFirst({
         where: {
@@ -137,8 +149,8 @@ export default class ProjectController extends ControllerBase {
           avatar: true,
           duration: true,
           cost: true,
-          amountPaid: true,
-          status: true,
+          isCompleted: true,
+          createdAt: true,
           suspends: {
             select: {
               id: true,
@@ -195,20 +207,35 @@ export default class ProjectController extends ControllerBase {
       return this.errorResult(ex)
     }
 
+    if (result != null) {
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      const extensionsDuration = result.extensions.reduce((acc, obj) => acc + obj.byDuration, 0)
+      return {
+        ...result,
+        amountPaid: result.payments.reduce((acc, obj) => acc.add(obj.amount), new Decimal(0)),
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        duration: result.duration + extensionsDuration,
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        status: result.isCompleted === 1 ? 'COMPLETED' : this.getStatus(result.createdAt, result.duration + extensionsDuration, result.suspends.map(suspend => ({ from: suspend.fromDate, to: suspend.toDate })))
+      }
+    }
+
     return result
   }
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
     // precondition
-    const missingFields = this.requiredResult(data, 'name', 'cost', 'amountPaid', 'duration')
+    const missingFields = this.requiredResult(data, 'name', 'cost', 'duration')
     if (missingFields !== false) return missingFields
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     // critical operation
     const projectData = data as Project
     projectData.creatorId = userInfo.id
+    if (projectData.createdAt != null) projectData.createdAt = new Date(projectData.createdAt)
+
     let result
     try {
       result = await this.prismaClient.project.create({
@@ -236,7 +263,7 @@ export default class ProjectController extends ControllerBase {
     // precondition: none
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const condition: {
       id: number
@@ -251,6 +278,12 @@ export default class ProjectController extends ControllerBase {
     }
 
     // critical operatoin
+    const projectData = data as FullProject
+    if (projectData.createdAt != null) projectData.createdAt = new Date(projectData.createdAt)
+    if (projectData.status != null) {
+      projectData.isCompleted = (projectData.status === 'COMPLETED') ? 1 : 0
+      delete projectData.status
+    }
     let result
     try {
       result = await this.prismaClient.project.updateMany({
@@ -281,7 +314,7 @@ export default class ProjectController extends ControllerBase {
     // precondition: none
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const condition: {
       id: number
@@ -319,5 +352,17 @@ export default class ProjectController extends ControllerBase {
         message: `project ${id} not found or user: ${userInfo.nam} is cann't delete the project`
       }
     }
+  }
+
+  private getStatus (createdDate: Date, duration: number, suspends: Array<{ from: Date, to: Date }>): Status {
+    const now = Date.now()
+    for (let i = 0; i < suspends.length; i++) {
+      if (suspends[i].from.getTime() <= now && suspends[i].to.getTime() > now) {
+        return 'STOPPED'
+      }
+    }
+
+    if (now < createdDate.getTime() + duration * (1000 * 60 * 60 * 24)) return 'WORKING'
+    else return 'LATE'
   }
 }

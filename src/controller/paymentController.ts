@@ -55,11 +55,11 @@ export default class PaymentController extends ControllerBase {
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
     // precondition
-    const missingFields = this.requiredResult(data, 'projectId', 'amount', 'paidAt')
+    const missingFields = this.requiredResult(data, 'projectId', 'amount')
     if (missingFields !== false) return missingFields
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const paymentData = data as Payment
     paymentData.paidAt = new Date(paymentData.paidAt)
@@ -114,7 +114,7 @@ export default class PaymentController extends ControllerBase {
     // precondition: none
 
     // checking privelege
-    if (userInfo.rol === 'VIEWER') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
+    if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const condition: {
       id: number
