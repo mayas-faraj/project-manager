@@ -15,8 +15,9 @@ declare global {
 export type Status = 'WORKING' | 'STOPPED' | 'COMPLETED' | 'LATE'
 
 export interface FullProject extends Project {
-  amountPaid: Decimal
+  amountPaid?: Decimal
   status?: Status
+  payments: any
 }
 
 export interface UserInfo {

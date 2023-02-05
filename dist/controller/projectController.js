@@ -229,6 +229,16 @@ class ProjectController extends controllerBase_1.ControllerBase {
             projectData.creatorId = userInfo.id;
             if (projectData.createdAt != null)
                 projectData.createdAt = new Date(projectData.createdAt);
+            if (projectData.amountPaid != null) {
+                projectData.payments = {
+                    create: {
+                        amount: projectData.amountPaid,
+                        description: projectData.name,
+                        creatorId: userInfo.id
+                    }
+                };
+                delete projectData.amountPaid;
+            }
             let result;
             try {
                 result = yield this.prismaClient.project.create({

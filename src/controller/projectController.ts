@@ -1,4 +1,3 @@
-import { Project } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime'
 import { Model, UserInfo, OperationResult, Status, FullProject } from '../types'
 import { ControllerBase } from './controllerBase'
@@ -232,9 +231,19 @@ export default class ProjectController extends ControllerBase {
     if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     // critical operation
-    const projectData = data as Project
+    const projectData = data as FullProject
     projectData.creatorId = userInfo.id
     if (projectData.createdAt != null) projectData.createdAt = new Date(projectData.createdAt)
+    if (projectData.amountPaid != null) {
+      projectData.payments = {
+        create: {
+          amount: projectData.amountPaid,
+          description: projectData.name,
+          creatorId: userInfo.id
+        }
+      }
+      delete projectData.amountPaid
+    }
 
     let result
     try {
