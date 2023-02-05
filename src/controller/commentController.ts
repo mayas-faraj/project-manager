@@ -83,7 +83,7 @@ export default class CommentController extends ControllerBase {
     let result
     try {
       result = await this.prismaClient.comment.create({
-        data: data as Comment
+        data: commentData
       })
     } catch (ex: any) {
       return this.errorResult(ex)

@@ -232,7 +232,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
             let result;
             try {
                 result = yield this.prismaClient.project.create({
-                    data: data
+                    data: projectData
                 });
             }
             catch (ex) {
@@ -280,7 +280,7 @@ class ProjectController extends controllerBase_1.ControllerBase {
                     where: {
                         AND: condition
                     },
-                    data
+                    data: projectData
                 });
             }
             catch (ex) {

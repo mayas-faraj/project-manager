@@ -82,12 +82,12 @@ export default class SuspendController extends ControllerBase {
 
     // critical operation
     suspendData.creatorId = userInfo.id
-    suspendData.fromDate = new Date(suspendData.fromDate)
-    suspendData.toDate = new Date(suspendData.toDate)
+    if (suspendData.fromDate != null) suspendData.fromDate = new Date(suspendData.fromDate)
+    if (suspendData.toDate != null) suspendData.toDate = new Date(suspendData.toDate)
     let result
     try {
       result = await this.prismaClient.suspend.create({
-        data: data as Suspend
+        data: suspendData
       })
     } catch (ex: any) {
       return this.errorResult(ex)

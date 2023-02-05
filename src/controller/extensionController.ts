@@ -84,7 +84,7 @@ export default class ExtensionController extends ControllerBase {
     let result
     try {
       result = await this.prismaClient.extension.create({
-        data: data as Extension
+        data: extensionData
       })
     } catch (ex: any) {
       return this.errorResult(ex)

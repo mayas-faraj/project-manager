@@ -61,14 +61,15 @@ class PaymentController extends controllerBase_1.ControllerBase {
     create(userInfo, data) {
         return __awaiter(this, void 0, void 0, function* () {
             // precondition
-            const missingFields = this.requiredResult(data, 'projectId', 'amount');
+            const missingFields = this.requiredResult(data, 'projectId', 'amount', 'description');
             if (missingFields !== false)
                 return missingFields;
             // checking privelege
             if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR')
                 return this.noPrivelegeResult(userInfo.nam, userInfo.rol);
             const paymentData = data;
-            paymentData.paidAt = new Date(paymentData.paidAt);
+            if (paymentData.paidAt != null)
+                paymentData.paidAt = new Date(paymentData.paidAt);
             if (userInfo.rol === 'PROJECT_MANAGER') {
                 try {
                     const result = yield this.prismaClient.project.findUnique({
@@ -91,7 +92,7 @@ class PaymentController extends controllerBase_1.ControllerBase {
             let result;
             try {
                 result = yield this.prismaClient.payment.create({
-                    data: data
+                    data: paymentData
                 });
             }
             catch (ex) {

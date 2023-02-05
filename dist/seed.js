@@ -179,8 +179,8 @@ function main() {
                 media: {
                     createMany: {
                         data: [
-                            { src: '/imgs/projects/project2-1.png', title: 'منظر علوي', creatorId: 2 },
-                            { src: '/imgs/projects/project2-2.png', title: 'منظر جانبي', creatorId: 2 }
+                            { src: '/imgs/projects/project2-1.jpg', title: 'منظر علوي', creatorId: 2 },
+                            { src: '/imgs/projects/project2-2.jpg', title: 'منظر جانبي', creatorId: 2 }
                         ]
                     }
                 },
@@ -228,8 +228,8 @@ function main() {
                 media: {
                     createMany: {
                         data: [
-                            { src: '/imgs/projects/project3-2.png', title: 'المنظر العلوي', creatorId: 1 },
-                            { src: '/imgs/projects/project3-3.png', title: 'من ساحة الحياة', creatorId: 1 }
+                            { src: '/imgs/projects/project3-2.jpg', title: 'المنظر العلوي', creatorId: 1 },
+                            { src: '/imgs/projects/project3-3.jpg', title: 'من ساحة الحياة', creatorId: 1 }
                         ]
                     }
                 },
@@ -299,8 +299,8 @@ function main() {
                 media: {
                     createMany: {
                         data: [
-                            { src: '/imgs/projects/project4-2.png', title: 'منظر رئيسي', creatorId: 2 },
-                            { src: '/imgs/projects/project4-3.png', title: '', creatorId: 2 }
+                            { src: '/imgs/projects/project4-2.jpg', title: 'منظر رئيسي', creatorId: 2 },
+                            { src: '/imgs/projects/project4-3.jpg', title: '', creatorId: 2 }
                         ]
                     }
                 },

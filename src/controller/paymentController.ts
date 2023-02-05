@@ -55,14 +55,14 @@ export default class PaymentController extends ControllerBase {
 
   public async create (userInfo: UserInfo, data: Object): Promise<OperationResult> {
     // precondition
-    const missingFields = this.requiredResult(data, 'projectId', 'amount')
+    const missingFields = this.requiredResult(data, 'projectId', 'amount', 'description')
     if (missingFields !== false) return missingFields
 
     // checking privelege
     if (userInfo.rol === 'VIEWER' || userInfo.rol === 'GOVERNOR') return this.noPrivelegeResult(userInfo.nam, userInfo.rol)
 
     const paymentData = data as Payment
-    paymentData.paidAt = new Date(paymentData.paidAt)
+    if (paymentData.paidAt != null) paymentData.paidAt = new Date(paymentData.paidAt)
     if (userInfo.rol === 'PROJECT_MANAGER') {
       try {
         const result = await this.prismaClient.project.findUnique({
@@ -85,7 +85,7 @@ export default class PaymentController extends ControllerBase {
     let result
     try {
       result = await this.prismaClient.payment.create({
-        data: data as Payment
+        data: paymentData
       })
     } catch (ex: any) {
       return this.errorResult(ex)

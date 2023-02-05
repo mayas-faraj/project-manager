@@ -89,7 +89,7 @@ class CommentController extends controllerBase_1.ControllerBase {
             let result;
             try {
                 result = yield this.prismaClient.comment.create({
-                    data: data
+                    data: commentData
                 });
             }
             catch (ex) {

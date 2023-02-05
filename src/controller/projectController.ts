@@ -239,7 +239,7 @@ export default class ProjectController extends ControllerBase {
     let result
     try {
       result = await this.prismaClient.project.create({
-        data: data as Project
+        data: projectData
       })
     } catch (ex: any) {
       return this.errorResult(ex)
@@ -290,7 +290,7 @@ export default class ProjectController extends ControllerBase {
         where: {
           AND: condition
         },
-        data
+        data: projectData
       })
     } catch (ex) {
       return this.errorResult(ex)

@@ -90,7 +90,7 @@ class ExtensionController extends controllerBase_1.ControllerBase {
             let result;
             try {
                 result = yield this.prismaClient.extension.create({
-                    data: data
+                    data: extensionData
                 });
             }
             catch (ex) {

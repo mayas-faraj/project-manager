@@ -91,7 +91,7 @@ class MediaController extends controllerBase_1.ControllerBase {
             let result;
             try {
                 result = yield this.prismaClient.media.create({
-                    data: data
+                    data: mediaData
                 });
             }
             catch (ex) {

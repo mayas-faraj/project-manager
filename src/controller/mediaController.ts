@@ -85,7 +85,7 @@ export default class MediaController extends ControllerBase {
     let result
     try {
       result = await this.prismaClient.media.create({
-        data: data as Media
+        data: mediaData
       })
     } catch (ex: any) {
       return this.errorResult(ex)
