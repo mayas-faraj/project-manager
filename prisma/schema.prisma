@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql" 
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -44,6 +44,7 @@ model Project {
   avatar             String?     @db.VarChar(500)
   duration           Int         @default(0)
   cost               Decimal     @default(0)
+  progress           Int?        @default(0)
   isCompleted        Int         @default(0) @map("is_completed")
   creatorId          Int         @map("user_id")
   creator            User        @relation(fields: [creatorId], references: [id])
