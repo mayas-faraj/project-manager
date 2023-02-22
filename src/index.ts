@@ -38,9 +38,9 @@ const getMulter = (storagePath: string, namePrefix: string, allowedExtensions: R
   })
 }
 
-const userImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000).single('avatar')
-const projectImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 800000).single('avatar')
-const docMiddleware = getMulter('dist/uploads/docs', 'doc_', /doc|docx|txt|xls|xlsx|pdf/, 5000000).single('doc')
+const userImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 1500000).single('avatar')
+const projectImageMiddleware = getMulter('dist/uploads/imgs/users', 'img_', /jpeg|jpg|png|gif|svg/, 1500000).single('avatar')
+const docMiddleware = getMulter('dist/uploads/docs', 'doc_', /jpeg|jpg|png|gif|svg/, 1500000).single('doc')
 
 const fileOutput = (req: Request, res: Response): void => {
   if (req.file != null) {

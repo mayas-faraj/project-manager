@@ -36,6 +36,7 @@ export default class ProjectController extends ControllerBase {
           engineerPhone: true,
           engineerDepartment: true,
           cost: true,
+          progress: true,
           duration: true,
           longitude: true,
           latitude: true,
@@ -148,6 +149,7 @@ export default class ProjectController extends ControllerBase {
           avatar: true,
           duration: true,
           cost: true,
+          progress: true,
           isCompleted: true,
           createdAt: true,
           suspends: {

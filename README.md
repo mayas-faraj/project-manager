@@ -234,6 +234,7 @@ the result's form like the json data below:
   "avatar": "/imgs/projects/project4-1.jpg",
   "duration": 180,
   "cost": "1200000000",
+  "progress": 34,
   "amountPaid": "400000000",
   "status": "WORKING",
   "viewers": [
@@ -297,11 +298,16 @@ the result's form like the json data below:
 ```
 viewers sub-data container list of users who has privelege to view project, and createor sub-data represents the info of user who create the project.
 
+create project:
+you will add the field what you need to update only, for example, update excerpt and avatar, and provide the project id
+```bash
+curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"name": "test project", "remark": "new description", "avatar": "/uploads/new-avatar.png", "cost": 340000000, "progress": 12, "duration": 360}' http://<DOMAIN>:4000/api/projects/7
+```
 
 update project:
 you will add the field what you need to update only, for example, update excerpt and avatar, and provide the project id
 ```bash
-curl -X PUT -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"id:" 2, "remark": "new description", "avatar": "/uploads/new-avatar.png", "cost": 340000000, "duration": 360}' http://<DOMAIN>:4000/api/projects/7
+curl -X PUT -H 'Content-Type: application/json' -H 'Authorization: Bearer <TOKEN>' -d '{"id:" 2, "remark": "new description", "avatar": "/uploads/new-avatar.png", "cost": 340000000, "progress": 12, "duration": 360}' http://<DOMAIN>:4000/api/projects/7
 ```
 
 delete project:
