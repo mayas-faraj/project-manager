@@ -373,7 +373,7 @@ export default class ProjectController extends ControllerBase {
       }
     }
 
-    if (now < createdDate.getTime() + duration * (1000 * 60 * 60 * 24)) return 'WORKING'
+    if (now < createdDate.getTime() + duration * (1000 * 60 * 60 * 24 * 30)) return 'WORKING'
     else return 'LATE'
   }
 }
