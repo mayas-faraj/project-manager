@@ -290,7 +290,7 @@ export default class ProjectController extends ControllerBase {
 
     // critical operatoin
     const projectData = data as FullProject
-    if (projectData.progress > 100) projectData.progress = 100;
+    if (projectData.progress != null && projectData.progress > 100) projectData.progress = 100;
     if (projectData.createdAt != null) projectData.createdAt = new Date(projectData.createdAt)
     if (projectData.status != null) {
       projectData.isCompleted = (projectData.status === 'COMPLETED') ? 1 : 0
